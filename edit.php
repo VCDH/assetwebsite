@@ -44,6 +44,12 @@ if (!is_numeric($_GET['id'])) {
 	$data['latitude'] = is_numeric($cookiecontent[0]['lat']) ? $cookiecontent[0]['lat'] : 52;
 	$data['longitude'] = is_numeric($cookiecontent[0]['lng']) ? $cookiecontent[0]['lng'] : 5;
 	$data['heading'] = 0;
+	//default organisation
+	$data['aansturing'] = getuserdata('organisation');
+	$data['wegbeheerder'] = getuserdata('organisation');
+	$data['onderhoud'] = getuserdata('organisation');
+	$data['voeding'] = getuserdata('organisation');
+	$data['verbinding'] = getuserdata('organisation');
 }
 else {
 	//get asset from db
@@ -584,7 +590,6 @@ include('menu.inc.php');
 			//wegbeheerder
 			if ($fieldclass == 'wegbeheerder') {
 				echo '<select name="'.$fieldid.'">';
-					echo '<option></option>';
 					$qry2 = "SELECT `id`, `name` FROM `".$db['prefix']."organisation` 
 					ORDER BY `name`";
 					$res2 = mysqli_query($db['link'], $qry2);

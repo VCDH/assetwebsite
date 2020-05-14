@@ -305,8 +305,10 @@ img.map-style-oldskool {
 	text-align: center;
 }
 #map-loading span {	
-	background-color: #FFF;
-	padding: 2px;
+	background-color: rgba(0, 0, 0, 0.4);
+	padding: 4px;
+	color: #FFF;
+	border-radius: 4px;
 }
 #map-nolayersactive {
 	display: none;
