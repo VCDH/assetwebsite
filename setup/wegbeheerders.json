@@ -1,0 +1,187 @@
+[
+	{
+		"name": "Rijkswaterstaat MN",
+		"strokecolour" : "#000",
+		"fillcolour" : "#cfc"
+	},
+	{
+		"name": "Rijkswaterstaat NON",
+		"strokecolour" : "#000",
+		"fillcolour" : "#9cf"
+	},
+	{
+		"name": "Rijkswaterstaat NWN",
+		"strokecolour" : "#000",
+		"fillcolour" : "#ff9"
+	},
+	{
+		"name": "Rijkswaterstaat ZN",
+		"strokecolour" : "#000",
+		"fillcolour" : "#fc9"
+	},
+    {
+		"name": "Rijkswaterstaat ZWN",
+		"strokecolour" : "#000",
+		"fillcolour" : "#c9f"
+	},
+	{
+		"name": "Rijkswaterstaat VWM",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+	{
+		"name": "Provincie Noord-Brabant",
+		"strokecolour" : "#000",
+		"fillcolour" : "#D00"
+	},
+	{
+		"name": "provincie Zuid-Holland",
+		"strokecolour" : "#000",
+		"fillcolour" : "#c00"
+	},
+	{
+		"name": "provincie Noord-Holland",
+		"strokecolour" : "#2891E1",
+		"fillcolour" : "#FAAF00"
+	},
+	{
+		"name": "gemeente Barendrecht",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+	{
+		"name": "Gemeente Breda",
+		"strokecolour" : "#D91D49",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Capelle a/d IJssel",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+    {
+		"name": "gemeente Delft",
+		"strokecolour" : "#0078C8",
+		"fillcolour" : "#EBEDEE"
+	},
+    {
+		"name": "gemeente Den Haag",
+		"strokecolour" : "#155429",
+		"fillcolour" : "#fff"
+	},
+    {
+		"name": "gemeente Deventer",
+		"strokecolour" : "#0077B2",
+		"fillcolour" : "#fff"
+	},
+    {
+		"name": "gemeente Enschede",
+		"strokecolour" : "#CC141E",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Gouda",
+		"strokecolour" : "#BE3730",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Groningen",
+		"strokecolour" : "#E60004",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Leiden",
+		"strokecolour" : "#ed2024",
+		"fillcolour" : "#FFF"
+	},
+	{
+		"name": "gemeente Leiderdorp",
+		"strokecolour" : "#696B6B",
+		"fillcolour" : "#CC990D"
+	},
+	{
+		"name": "gemeente Leidschendam-Voorburg",
+		"strokecolour" : "#004F68",
+		"fillcolour" : "#5DB88E"
+	},
+	{
+		"name": "Gemeente Maastricht",
+		"strokecolour" : "#00263D",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Pijnacker-Nootdorp",
+		"strokecolour" : "#01529E",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Rijswijk",
+		"strokecolour" : "#004C92",
+		"fillcolour" : "#E4EEDF"
+	},
+	{
+		"name": "gemeente Rotterdam",
+		"strokecolour" : "#000",
+		"fillcolour" : "#9AC61E"
+	},
+	{
+		"name": "gemeente Schiedam",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+	{
+		"name": "gemeente Spijkenisse",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+	{
+		"name": "Gemeente Tilburg",
+		"strokecolour" : "#053D63",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "gemeente Vlaardingen",
+		"strokecolour" : "#000",
+		"fillcolour" : "#666"
+	},
+	{
+		"name": "gemeente Waddinxveen",
+		"strokecolour" : "#1A171B",
+		"fillcolour" : "#F3CE00"
+	},
+	{
+		"name": "gemeente Wassenaar",
+		"strokecolour" : "#ED1B2F",
+		"fillcolour" : "#006AB6"
+	},
+	{
+		"name": "gemeente Westland",
+		"strokecolour" : "#7CC049",
+		"fillcolour" : "#98C0E4"
+	},
+	{
+		"name": "gemeente Zoetermeer",
+		"strokecolour" : "#ffe00f",
+		"fillcolour" : "#0072b9"
+	},
+	{
+		"name": "gemeente Zwolle",
+		"strokecolour" : "#476DB7",
+		"fillcolour" : "#fff"
+	},
+	{
+		"name": "Havenbedrijf Rotterdam",
+		"strokecolour" : "#009CD6",
+		"fillcolour" : "#FFD800"
+	},
+	{
+		"name": "Verkehrszentrale NRW",
+		"strokecolour" : "#00A84F",
+		"fillcolour" : "#ABADB0"
+	},
+	{
+		"name": "VC Antwerpen",
+		"strokecolour" : "#000",
+		"fillcolour" : "#FFD900"
+	}
+]

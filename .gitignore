@@ -1,0 +1,7 @@
+dbconnect.inc.php
+mailconfig.inc.php
+z_oud_*
+store/*
+images/*
+!images/.htaccess
+docs/

@@ -1,0 +1,358 @@
+/*
+ 	scenariobrowser - viewer en editor voor verkeersmanagementscenario's
+	Copyright (C) 2016-2019 Gemeente Den Haag, Netherlands
+	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
+    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Developed by Jasper Vries
+ 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+ 
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/* main containers*/
+html, body {
+	font-family: Verdana, Helvetica, sans-serif;
+	font-size: small;
+	color: #333;
+	background: #7cc4ee;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+div#navigation {
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 89;
+}
+div#content {
+	display: block;
+	text-align: left;
+	margin: auto;
+	width: 900px;
+	padding: 48px 24px;
+	background: #FFF;
+}
+/* block level elements */
+h1 {
+	color: #0b4285;
+	font-size: large;	
+}
+h2 {
+	color: #0b4285;
+	font-size: medium;	
+}
+p, ol {
+	max-width: 900px;	
+}
+blockquote {
+	margin-left: 40px;
+	padding-left: 0;	
+}
+/* inline */
+a {
+	color: #3989c3;
+	text-decoration: underline;
+	cursor: pointer;
+}
+a:hover {
+	color: #9ac61e;
+}
+/* tables */
+table {
+	text-align: left;
+	border-collapse: collapse;	
+	font-size: small;
+	background-color: #FFF;
+	margin: 4px 0;
+}
+th {
+	font-weight: bold;
+	border: 1px solid #999;
+	border-width: 0 0 3px 0;
+	text-align: left;
+	padding: 1px 4px;
+}
+td {
+	border: 1px solid #CCC;	
+	padding: 1px 4px;
+}
+tr.bold td {
+	font-weight: bold;
+}
+table.noborder td {
+	border: none;
+}
+table.noborder td:first-child {
+	padding-left: 0;
+}
+td.highlight {
+	background-color: #FF3;
+}
+
+/* 
+formuliervelden 
+*/
+select {
+	min-width: 300px;	
+}
+input[type=text], input[type=number], input[type=search], input[type=tel] {
+	width: 294px;
+}
+input[type=password] {
+	width: 144px;
+}
+input[type=text], input[type=number], input[type=password], input[type=search], input[type=tel], select, textarea {
+	background-color: #EEE;
+	border: solid #666;
+	border-width: 0 1px 1px 1px;
+	border-radius: 0 0 4px 4px;
+	padding: 2px;
+}
+input[type=submit], input[type=button] {
+	min-width: 160px;
+}
+input[type=file] {
+	max-width: 300px;
+}
+input#searchbox {
+	width: 200px;
+	border: none;
+}
+textarea {
+	width: 294px;
+	min-width: 294px; /* only allow vertical resizing */
+	max-width: 294px;
+	height: 46px;	
+}
+fieldset {
+	border: 1px solid #999;
+	border-radius: 5px;
+	margin: 8px 0;
+}
+legend {
+	font-weight: bold;
+}
+label.disabled {
+	color: #999;
+}
+
+/* 
+informatieballonnen 
+*/
+.error {
+	padding: 16px;
+	border: 1px solid #900;
+	background-color: #FCC;
+	border-radius: 5px;	
+}
+.warning {
+	padding: 16px;
+	border: 1px solid #FC0;
+	background-color: #FF9;
+	border-radius: 5px;	
+}
+.success {
+	padding: 16px;
+	border: 1px solid #9ac61e;
+	background-color: #eaf5ce;
+	border-radius: 5px;	
+}
+.info {
+	padding: 16px;
+	border: 1px solid #7cc4ee;
+	background-color: #d5eefd;
+	border-radius: 5px;	
+}
+.closeparent {
+	display: block;
+	float: right;
+	font-size: x-small;
+	cursor: pointer;
+}
+
+/* 
+menu bar 
+*/
+ul.toolbartab {
+    margin-top: -6px;
+	margin-left: -20px;
+}
+
+ul.toolbartab li {
+    display: block;
+	float: left;
+	font-weight: bold;
+}
+ul.toolbartab li a, ul.toolbartab li span {
+    display: block;
+    border: 1px solid #CCC;
+	border-radius: 4px;
+	background-color: #FFF;
+	margin: 2px;
+	padding: 4px;	
+	height: 16px;
+	cursor: pointer;
+	text-decoration: none;
+}
+ul.toolbartab li span {
+	cursor: default;
+}
+
+ul.toolbartab li span.searchbox {
+	padding-left: 0;
+	padding-right: 0;
+}
+ul.toolbartab li span.searchbox input {
+	margin-top: -1px;
+}
+ul.toolbartab li#scnactive img {
+	vertical-align: middle;
+}
+ul.toolbartab li.button {
+	border-color: #333;
+	background: linear-gradient(to bottom, #CCC, #999);
+	cursor: pointer;	
+}
+ul.toolbartab li.button:hover {
+	border-color: #666;
+	background: linear-gradient(to bottom, #FFF, #CCC);
+}
+
+/*
+map related
+*/
+div#map-options-container {
+	position:absolute;
+	z-index: 86;
+	right:16px;
+	top:32px;
+	border: 1px solid #CCC;
+	background-color: #FFF;
+	padding: 8px;
+	text-align: left;
+	font-size: 0.9em;
+}
+#map-options-container ul, #map-options-container li {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+#map-options-container fieldset {
+	border: 1px solid #CCC;
+	border-radius: 4px;
+	margin: 8px 0;
+}
+#map-options-container fieldset:first-of-type {
+	margin-top: 0;
+}
+#map-options-container fieldset:last-of-type {
+	margin-bottom: 0;
+}
+#map-options-container li.disabled label {
+	color: #CCC;
+}
+/* map style */
+img.map-style-grayscale {
+	filter: grayscale(1) brightness(1.1);
+}
+img.map-style-lighter {
+	filter: brightness(1.05) contrast(1.1) grayscale(0.1);
+}
+img.map-style-dark {
+	filter: invert(1) grayscale(1);
+}
+img.map-style-oldskool {
+	filter: sepia(0.5) brightness(1.05);
+}
+/* markers */
+.L-icon-trans {
+	opacity: 0.5;
+}
+.hectolabel {
+	font-size: x-small;
+	color: #333;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	background:  none;
+	border: none;
+	border-radius: 0;
+	opacity: 1 !important;
+	box-shadow: none;
+	margin-left: 0;
+	padding: 5px;
+}
+.hectolabel::before {
+	border: none;
+}
+/* map messages */
+#map-loading {	
+	z-index: 85;
+	position: absolute;
+	left: 0;
+	bottom: 50%;
+	width: 100%;
+	text-align: center;
+}
+#map-loading span {	
+	background-color: #FFF;
+	padding: 2px;
+}
+#map-nolayersactive {
+	display: none;
+	z-index: 85;
+	position: absolute;
+	left: 0;
+	top: 10%;
+	width: 100%;
+	text-align: center;
+}
+
+/*
+jquery ui
+*/
+span.ui-icon {
+	display: inline-block;
+	vertical-align: bottom;	
+}
+.ui-icon-attachment {
+	background-image: url("images/attachment.png");
+}
+.ui-widget {
+    font-size: small;
+}
+#dialog {
+	text-align: left;
+}
+.ui-autocomplete-category {
+    font-weight: bold;
+    padding: .2em .4em;
+    margin: .8em 0 .2em;
+    line-height: 1.5;
+}
+.ui-autocomplete {
+	max-height: 90%;
+	overflow-y: scroll;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+}
+ul.ui-autocomplete li.notfound {
+	color: #C00;
+}
+
+/* 
+tabulator
+*/
+div .tabulator {
+	font-size: x-small;
+}
