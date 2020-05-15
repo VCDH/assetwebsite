@@ -34,6 +34,15 @@ if (mysqli_num_rows($res)) {
     echo '<table>';
     while($data = mysqli_fetch_row($res)) {
         echo '<tr><td><img src="image.php?t=' . $data[0] . '&amp;w=0" width="16" heigth=16"></td><td>' . htmlspecialchars($data[1]) . '</td></tr>';
+        //TODO: aanname dat DRIP type 1 is en VRI type 3
+        if ($data[0] == 1) {
+            //DRIP met standaardtekst
+            echo '<tr><td><img src="image.php?t=' . $data[0] . '&amp;w=0&amp;i=1" width="16" heigth=16"></td><td>' . htmlspecialchars($data[1]) . ' met standaardtekst</td></tr>';
+        }
+        if ($data[0] == 3) {
+            //iVRI
+            echo '<tr><td><img src="image.php?t=' . $data[0] . '&amp;w=0&amp;i=1" width="16" heigth=16"></td><td>iVRI</td></tr>';
+        }
     }
     echo '</table>';
 }

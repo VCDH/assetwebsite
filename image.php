@@ -47,19 +47,29 @@ if (is_numeric($_GET['t'])) {
 					break;
 				}
 				$assettype = mysqli_fetch_row($res);
-				$assettype = $assettype[0];
 				$lineshape = $assettype[1];
+				$assettype = $assettype[0];
 			}
 			else {
 				$assettype = 0;
 			}
 			//default lineshape
-			if (empty($lineshape)) { //default lineshape is a square, if none is defined in the database
-				$lineshape = '1,0 1,15; 0,1 15,1; 15,1, 15,15; 1,15 15,15';
+			if (empty($lineshape)) { 
+				//default lineshape is a square, if none is defined in the database
 				//lineshape format is x0,y0 x1,y1[; x0,y0 x1,y1[; ...]] spaces, commas and semicolons are strict
+				$lineshape = '1,0 1,15; 0,1 15,1; 15,1, 15,15; 1,15 15,15';
 			}
+			//afwijkend voor standaardtekst, iVRI
+			//TODO: aanname dat assettype 1 DRIP is
 			if ($_GET['i'] == 1) {
-				$lineshape .= '; 4,8 11,8; 4,12 11,12';
+				if ($assettype == 1) {
+					//DRIP
+					$lineshape .= '; 4,8 11,8; 4,12 11,12';
+				}
+				else {
+					//waarschijnlijk iVRI
+					$lineshape .= '; 8,4 8,5; 8,7 8,11';
+				}
 			}
 			//default colors
 			$bordercolor = '000000';
@@ -94,7 +104,7 @@ if (is_numeric($_GET['t'])) {
 				imageline($image, $start[0], $start[1], $end[0], $end[1], $bordercolor);
 			}
 			//fill
-			imagefill($image, floor($imgsize/2), floor($imgsize/2)+2, $fillcolor);
+			imagefill($image, floor($imgsize/2)+2, floor($imgsize/2)+2, $fillcolor);
 			//store image
 			imagesavealpha($image, true);
 			imagepng($image, $imagefile, 9);

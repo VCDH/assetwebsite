@@ -179,7 +179,8 @@ else {
 		header('HTTP/1.0 401 Unauthorized');
 		exit;
 	}
-
+	//check of er een afwijkend pictogram getekend moet worden
+	$addfieldid = 0;
 	//voor DRIPs selecteer ook standaardtekst
 	$qry = "SELECT `id`, `assettype` FROM `".$db['prefix']."addfield`
 	WHERE `name` LIKE 'standaardtekst' 
@@ -189,6 +190,21 @@ else {
 	if (mysqli_num_rows($res)) {
 		$data = mysqli_fetch_row($res);
 		$addfieldid = $data[0];
+	}
+	else {
+		//voor VRI/TDI selecteer iVRI of niet
+		$qry = "SELECT `id`, `assettype` FROM `".$db['prefix']."addfield`
+		WHERE `name` LIKE 'iVRI' 
+		AND `assettype` = '" . mysqli_real_escape_string($db['link'], $_GET['layer']) . "'
+		LIMIT 1";
+		$res = mysqli_query($db['link'], $qry);
+		if (mysqli_num_rows($res)) {
+			$data = mysqli_fetch_row($res);
+			$addfieldid = $data[0];
+		}
+	}
+	if ($addfieldid != 0) {
+		//query voor assets met mogelijk afwijkend pictogram
 		$qry = "SELECT `".$db['prefix']."asset`.`id` AS `assetid`, `code`, `latitude`, `longitude`, `heading`, `aansturing`, `status`, `content` FROM `".$db['prefix']."asset`
 		LEFT JOIN 
 		(SELECT * FROM `".$db['prefix']."addfieldcontent`
@@ -197,9 +213,9 @@ else {
 		WHERE `assettype` = '" . mysqli_real_escape_string($db['link'], $_GET['layer']) . "' 
 		AND `status` IN (1,2,3) 
 		AND " . bounds_to_sql($_GET['bounds']);
-		
 	}
 	else {
+		//query voor andere assets
 		$qry = "SELECT `id` AS `assetid`, `code`, `latitude`, `longitude`, `heading`, `aansturing`, `status` FROM `".$db['prefix']."asset`
 		WHERE `assettype` = '" . mysqli_real_escape_string($db['link'], $_GET['layer']) . "' 
 		AND `status` IN (1,2,3) 
