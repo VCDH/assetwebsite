@@ -27,4 +27,10 @@ $cfg['mail']['message']['lostpass'] = '<p>Beste {{NAME}},</p><p>Je nieuwe wachtw
 $cfg['mail']['subject']['newuser'] = 'assetwebsite account';
 $cfg['mail']['message']['newuser'] = '<p>Beste {{NAME}},</p><p>Er is een account voor je gemaakt voor <a href="{{SITE_URL}}">assetwebsite</a>. Je kunt inloggen met onderstaande gegevens.</p><p>gebruikersnaam: {{USERNAME}}<br>wachtwoord: {{PASSWORD}}</p><p>Met vriendelijke groeten,<br>BEREIK!</p>';
 
+$cfg['mail']['subject']['errorreport'] = 'assetwebsite melding onjuiste informatie';
+$cfg['mail']['message']['errorreport'] = '<p>Beste {{NAME}},</p><p>Er is door een gebruiker een melding gedaan van onjuiste informatie van een asset. Het foutrapport staat hier onder.</p><p>Met vriendelijke groeten,<br>BEREIK!</p><br><br>{{ERRORREPORT}}<br><br>{{EDITURL}}';
+
+$cfg['mail']['subject']['errorreportconfirmation'] = 'assetwebsite melding onjuiste informatie';
+$cfg['mail']['message']['errorreportconfirmation'] = '<p>Beste {{NAME}},</p><p>Je hebt zojuist een melding gedaan van onjuiste informatie van een asset. Een afschrift van het foutrapport staat hier onder.</p><p>Met vriendelijke groeten,<br>BEREIK!</p><br><br>{{ERRORREPORT}}';
+
 ?>

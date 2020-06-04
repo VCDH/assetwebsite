@@ -23,17 +23,20 @@ $login = getuserdata();
 //include database gegevens
 include('dbconnect.inc.php');
 
-$url_index = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')).'/index.php';
+$url_base = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
+$url_index = $url_base.'/index.php';
 
 //redirect if not logged in
-if (!getuserdata() || !accesslevelcheck('beheer_eigen')) {
+if ( (($_GET['do'] != 'report') && (!getuserdata() || !accesslevelcheck('beheer_eigen'))) 
+	|| (($_GET['do'] != 'report') && (!is_numeric($_GET['id']))) ) {
 	header('Location:'.$url_index);
-    exit;
+	exit;
 }
 
 $data = array();
 $additionaldata = array();
 $assettype = NULL;
+//insert new
 if (!is_numeric($_GET['id'])) {
 	//assettype validity is checked later on
 	if (is_numeric($_GET['newtype'])) {
@@ -51,6 +54,7 @@ if (!is_numeric($_GET['id'])) {
 	$data['voeding'] = getuserdata('organisation');
 	$data['verbinding'] = getuserdata('organisation');
 }
+//edit or report
 else {
 	//get asset from db
 	$qry = "SELECT * FROM `".$db['prefix']."asset` 
@@ -325,8 +329,99 @@ if (!empty($_POST)) {
 	}
 	//if checks passed, prepare to update database
 	if ($fieldcheck === TRUE) {
+		//redirect if not logged in
+		if (($_GET['do'] != 'report') && (!getuserdata() || !accesslevelcheck('beheer_eigen'))) {
+			header('Location:'.$url_index);
+			exit;
+		}
+		//report false information
+		elseif ($_GET['do'] == 'report') {
+			//create email body
+			$reportbody = '<table>';
+			$reportbody .= '<tr><th>veld</th><th>was</th><th>wordt</th></tr>';
+			foreach ($genericfields as $field) {
+				if (($data[$field[1]] != $_POST[$field[0]]) || ($field[1] == 'code')) {
+					$reportbody .= '<tr><td>';
+					$reportbody .= htmlspecialchars($field[1]);
+					$reportbody .= '</td><td>';
+					$reportbody .= htmlspecialchars($data[$field[1]]);
+					$reportbody .= '</td><td>';
+					$reportbody .= htmlspecialchars($_POST[$field[0]]);
+					$reportbody .= '</td></tr>';
+				}
+			}
+			foreach ($additionalfields as $field) {
+				if (in_array($field[2], array('drip_standaardtekst', 'drip_bewegwijzering'))) {
+					$additionaldata[$field[0]] = $additionaldata[$field[0]]['text'];
+					$_POST[$field[0]] = $_POST[$field[0] . '_text'];
+				}
+				if ($additionaldata[$field[0]] != $_POST[$field[0]]) {
+					$reportbody .= '<tr><td>';
+					$reportbody .= htmlspecialchars($field[1]);
+					$reportbody .= '</td><td>';
+					$reportbody .= htmlspecialchars($additionaldata[$field[0]]);
+					$reportbody .= '</td><td>';
+					$reportbody .= htmlspecialchars($_POST[$field[0]]);
+					$reportbody .= '</td></tr>';
+				}
+			}
+			$reportbody .= '</table>';
+			$reportbody .= '<p>Opmerking: ' . htmlspecialchars($_POST['comment']) . '</p>';
+
+			//get userdata
+			$qry = "SELECT `name`, `email`, `phone` FROM `".$db['prefix']."user`
+			WHERE `id` = " . getuserdata('id');
+			$res = mysqli_query($db['link'], $qry);
+			$userdata = mysqli_fetch_assoc($res);
+
+			$reportbody .= '<p>Ingestuurd door:<br>
+			naam: ' . htmlspecialchars($userdata['name']) .
+			'<br>e-mail: ' . htmlspecialchars($userdata['email']) .
+			'<br>telefoon: ' . htmlspecialchars($userdata['phone']) . '</p>';
+
+			//edit url
+			$editurl = $url_base . '/edit.php?id=' . $data['id'];
+
+			//send emails
+			if (file_exists('mailconfig.inc.php')) {
+				require_once 'mailconfig.inc.php';
+				require_once 'functions/send_mail.php';
+			}
+			else {
+				echo 'kan geen e-mails verzenden';
+				exit;
+			}
+
+			//get users with organisation
+			include ('accesslevels.cfg.php');
+			$qry = "SELECT `name`, `email` FROM `".$db['prefix']."user`
+			WHERE `organisation` = " . $data['organisation'] . "
+			AND `accesslevel` >= " . $cfg_accesslevel['beheer_eigen'];
+			$res = mysqli_query($db['link'], $qry);
+			while ($dat3 = mysqli_fetch_assoc($res)) {
+				//send to user who filed report
+				$to = $userdata['email'];
+				$cfg['mail']['subject']['errorreport'];
+				$message = $cfg['mail']['message']['errorreport'];
+				$message = str_replace(array('{{NAME}}', '{{USERNAME}}', '{{ERRORREPORT}}', '{{EDITURL}}', '{{SITE_URL}}'), array(htmlspecialchars($userdata['name']), $email, $reportbody, $editurl, $url_base), $message);
+				//send email
+				send_mail($to, $subject, $message);
+			}
+
+			//send to user who filed report
+			$to = $userdata['email'];
+			$cfg['mail']['subject']['errorreportconfirmation'];
+			$message = $cfg['mail']['message']['errorreportconfirmation'];
+			$message = str_replace(array('{{NAME}}', '{{USERNAME}}', '{{ERRORREPORT}}', '{{SITE_URL}}'), array(htmlspecialchars($userdata['name']), $email, $reportbody, $url_base), $message);
+			//send email
+			send_mail($to, $subject, $message);
+
+			//redirect
+			header('Location:'.$url_base.'/tabel.php?report=' . urlencode($data['id']));
+			exit;
+		}
 		//update entry
-		if (is_numeric($data['id'])) {
+		elseif (is_numeric($data['id'])) {
 			//copy old data to history
 			$qry = "INSERT INTO `".$db['prefix']."asset_history` (
 				`id`,
@@ -457,6 +552,7 @@ if (!empty($_POST)) {
 		//redirect on completion
 		if ($res === TRUE) {
 			header('Location:http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')).'/tabel.php?update=' . urlencode($data['id']));
+			exit;
 		}
 	}
 	//overload posted data
@@ -546,6 +642,12 @@ include('menu.inc.php');
 			<p class="warning">Let op: Eenmaal toegevoegd kan een asset niet meer verwijderd worden! <br>Voeg alleen een nieuwe asset toe als je zeker weet dat deze nog niet op de kaart staat. <br>Controleer daarom eerst in de <a href="tabel.php">tabel</a> of de toe te voegen asset er al is en misschien op de verkeerde plek staat.</p>
 			<?php
 		}
+		elseif ($_GET['do'] == 'report') {
+			?>
+			<h1>Foutieve informatie melden voor &quot;<?php echo htmlspecialchars($data['code']); ?>&quot;</h1>
+			<p class="info">Klopt er iets niet? Pas dan de foutieve informatie aan in onderstaand formulier. Gebruik het opmerkingenveld onderaan als je iets over dit asset wilt melden dat je niet kwijt kunt in de standaardvelden. Klik onderaan op de knop <i>Fout melden</i> om je rapport naar de functioneel beheerder(s) te sturen die aan dit asset gekoppeld zijn. Hierbij wordt je e-mailadres en telefoonnummer (als je dat in je account hebt opgeslagen) kenbaar gemaakt bij deze beheerder(s), zodat ze contact met je kunnen opnemen als dat nodig is. Je ontvangt zelf ook een afschrift van de melding. </p>
+			<?php
+		}
 		else {
 			?>
 			<h1>Asset &quot;<?php echo htmlspecialchars($data['code']); ?>&quot; bewerken</h1>
@@ -613,13 +715,23 @@ include('menu.inc.php');
 			if (($fieldclass == 'drip_standaardtekst') || ($fieldclass == 'drip_bewegwijzering')) {
 				?>
 				<span class="defaulttextcontrols">
-					Afbeelding (PNG-bestand max. 100 kB):<br>
-					<input type="file" name="<?php echo $fieldid; ?>_file" accept=".png, .jpg, .jpeg"><br>
-					<?php 
-					if ((!empty($fielddata['image'])) && (is_file('store/'.substr($fielddata['image'],0,1).'/'.$fielddata['image']))) {
+					<?php
+					if ($_GET['do'] != 'report') {
+						//we don't want file uploads in a report
 						?>
-						<input type="checkbox" name="<?php echo $fieldid; ?>_unsetfile" id="<?php echo $fieldid; ?>_unsetfile" value="true"> <label for="<?php echo $fieldid; ?>_unsetfile">Afbeelding verwijderen</label><br>
-						<img src="<?php echo 'store/'.substr($fielddata['image'],0,1).'/'.$fielddata['image']; ?>"><br>
+						Afbeelding (PNG-bestand max. 100 kB):<br>
+						<input type="file" name="<?php echo $fieldid; ?>_file" accept=".png, .jpg, .jpeg"><br>
+						<?php
+					}
+					if ((!empty($fielddata['image'])) && (is_file('store/'.substr($fielddata['image'],0,1).'/'.$fielddata['image']))) {
+						if ($_GET['do'] != 'report') {
+							//same as above
+							?>
+							<input type="checkbox" name="<?php echo $fieldid; ?>_unsetfile" id="<?php echo $fieldid; ?>_unsetfile" value="true"> <label for="<?php echo $fieldid; ?>_unsetfile">Afbeelding verwijderen</label><br>
+							<?php
+						}
+						?>
+						<img src="<?php echo 'store/'.substr($fielddata['image'],0,1).'/'.$fielddata['image']; ?>" style="max-width: 300px"><br>
 						<?php
 					}
 					?>
@@ -649,13 +761,22 @@ include('menu.inc.php');
 		</table>
 		<p>*) geeft een verplicht veld aan.</p>
 		</div>
-		<div style="float:left; margin-left: 8px;">
+		<div style="float:left; margin-left: 8px; margin-bottom: 16px;">
 			<p>Locatie op de kaart:</p>
 			<div id="minimap" style="width: 400px; height: 400px;"></div>
 		</div>
 		<div style="clear:both;"></div>
 		<input type="hidden" id="assettype" value="<?php echo $data['assettype']; ?>">
-		<input type="submit" value="Opslaan"> <a href="tabel.php">Annuleren (terug naar tabel)</a>
+		<?php
+		//comment field for reports
+		if ($_GET['do'] == 'report') {
+			echo 'Opmerkingen:<br>';
+			echo '<textarea name="comment">';
+			echo htmlspecialchars($_POST['comment']);
+			echo '</textarea><br>';
+		}
+		?>
+		<input type="submit" value="<?php echo ($_GET['do'] == 'report') ? 'Fout melden' : 'Opslaan'; ?>"> <a href="tabel.php">Annuleren (terug naar tabel)</a>
 		</form> 
 		<?php
 		}

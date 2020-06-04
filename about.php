@@ -46,16 +46,16 @@ include('menu.inc.php');
     <p>De mogelijkheid tot het maken van een DRIP-aanvraag is onderdeel van een afgestemd werkproces binnen <a href="https://www.bereiknu.nl" target="_blank">BEREIK!</a>. Hoewel DRIPs van wegbeheerders buiten de Zuidvleugel kunnen worden opgenomen, gelden in andere regio's wellicht andere werkprocessen. Het blijft de verantwoordelijkheid van de aanvrager om zijn of haar aanvraag op de juiste manier bij de juiste partijen in te dienen. Uiteraard is het voor andere regio's mogelijk om op de werkwijze van BEREIK! aan te sluiten.</p>
 
     <h1>Fouten in locatie/details melden</h1>
-    <p>De inhoud van de website, waaronder de locaties van de wegkantsystemen en de detailgegevens worden beheerd vanuit de verschillende organisaties. Functionaliteit om fouten te kunnen melden wordt nog toegevoegd.</p>
+    <p>De inhoud van de website, waaronder de locaties van de wegkantsystemen en de detailgegevens worden beheerd vanuit de verschillende organisaties. Functionaliteit om fouten te kunnen melden <a href="https://github.com/VCDH/assetwebsite/issues/1" target="_blank">wordt nog toegevoegd</a>.</p>
 
     <h1>Beheer website</h1>
-    <p>Het technisch beheer van deze website wordt namens BEREIK! gedaan door Jasper Vries. Meld technische problemen of wensen in de <a href="https://github.com/VCDH/assetwebsite/issues">issuetracker op GitHub</a>.</p>
+    <p>Het technisch beheer van deze website wordt namens BEREIK! gedaan door Jasper Vries. Meld technische problemen of wensen in de <a href="https://github.com/VCDH/assetwebsite/issues" target="_blank">issuetracker op GitHub</a>. Kijk eerst of er al een issue bestaat met dezelfde bug of wens alvorens een nieuw issue aan te maken.</p>
 
     <h1>Ik wil mijn assets ook op deze website</h1>
     <p>Lijkt het je als wegbeheerder, binnen of buiten BEREIK!, handig om je assets ook op deze website op te nemen? Neem dan contact op met jasper punt vries apenstaart denhaag punt nl voor de mogelijkheden. Het is ook mogelijk om als regio of individuele wegbeheerder gebruik te gaan maken van het DRIP-aanvraagformulier. Een bestaande lijst met assets kan in &eacute;&eacute;n keer worden ingelezen. Je blijft als wegbeheerder zelf verantwoordelijk voor het bijhouden van je eigen assets en krijgt hiervoor dan de nodige bewerkrechten.</p>
 
     <h1>Broncode</h1>
-    <p>De broncode van deze website is open source en is gepubliceerd op <a href="https://github.com/VCDH/assetwebsite">GitHub</a>.</p>
+    <p>De broncode van deze website is open source en is gepubliceerd op <a href="https://github.com/VCDH/assetwebsite" target="_blank">GitHub</a>.</p>
 
     <h1>Changelog</h1>
     <p>In april 2020 is de website volledig opnieuw opgebouwd. De voornaamste wijzigingen hierbij zijn:</p>
@@ -69,13 +69,10 @@ include('menu.inc.php');
         <li>Domeinscheiding doorgevoerd, alles zien maar alleen assets van eigen organisatie bewerken.</li>
         <li>Registratie ondersteunt nu meerdere organisaties met zelfde e-mailadres domein. In het bijzonder voor de verschillende organisatieonderdelen van Rijkswaterstaat. Gebruiker kiest bij registratie zelf het juiste organisatieonderdeel.</li>
     </ul>
+    <p>Een overzicht van nieuwe aanpassingen die sinds april 2020 zijn doorgevoerd is <a href="https://github.com/VCDH/assetwebsite/issues?q=is%3Aclosed+label%3Aenhancement" target="_blank">beschikbaar op GitHub</a>.</p>
 
     <h1>Backlog</h1>
-    <p>De volgende functionaliteiten worden overwogen om te worden toegevoegd.</p>
-    <ul>
-        <li>Melden van foutieve informatie en storingen van assets.</li>
-        <li>Zoekfunctie voor de kaart.</li>
-    </ul>
+    <p>Er worden een aantal nieuwe functionaliteiten en verbeteringen overwogen. Zie hiervoor de <a href="https://github.com/VCDH/assetwebsite/labels/enhancement" target="_blank">lijst op GitHub</a>.</p>
 </div>
 </body>
 </html>

@@ -249,7 +249,10 @@ elseif ($_GET['data'] == 'details') {
 		$html .= '<input type="hidden" id="heading" value="' . htmlspecialchars($data['heading']) . '">';
 
 		$html .= '<p><a href="index.php?id='.$data['assetid'].'">Centreer locatie op kaart</a></p>';
-
+		if (getuserdata()) {
+			//rapporteer fout via edit.php
+			$html .= '<p><a href="edit.php?do=report&amp;id='.$data['assetid'].'">Foutieve informatie melden</a></p>';
+		}
 		if (getuserdata() && (accesslevelcheck('beheer_eigen', $data['organisation']) || accesslevelcheck('beheer_alle'))) {
 			$html .= '<p><a href="edit.php?id='.$data['assetid'].'">Bewerken</a></p>';
 			$html .= '<p><a href="historie.php?id='.$data['assetid'].'">Historie</a></p>';
@@ -301,7 +304,10 @@ include('menu.inc.php');
 <div id="content" style="width:calc(100% - 48px);">
 	<?php
 	if (is_numeric($_GET['update'])) {
-		echo '<p class="success">Asset <a id="updatesuccessassetid">' . $_GET['update'] .'</a> opgeslagen. <span class="closeparent">Melding sluiten</span></p>';
+		echo '<p class="success">Asset <a id="updatesuccessassetid">' . htmlspecialchars($_GET['update']) .'</a> opgeslagen. <span class="closeparent">Melding sluiten</span></p>';
+	}
+	if (is_numeric($_GET['report'])) {
+		echo '<p class="success">Foutrapport voor asset <a id="updatesuccessassetid">' .  htmlspecialchars($_GET['report']) .'</a> verzonden. <span class="closeparent">Melding sluiten</span></p>';
 	}
 	?>
 	<div style="float:left;"><p>Asset: <select id="table-asset-filter"><option value="">(alle)</option>
