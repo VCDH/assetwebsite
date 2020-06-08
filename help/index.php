@@ -83,3 +83,6 @@ if (mysqli_num_rows($res)) {
 <li>A4li46.3f</li>
 </ul>
 -->
+
+<h1>Google Street View&trade;</h1>
+<p>Google Street View&trade; kan ook worden geopend door met de rechtermuisknop op de kaart te klikken (niet op een asset). Er opent dan een popup met een link naar Google Street View&trade;. Er is geen check of er daadwerkelijk Street View&trade; op de beoogde locatie beschikbaar is. In dat geval zal Street View&trade; op de dichtstbijzijnde locatie worden geopend, of kan Street View&trade; niet worden geopend en blijft het venster zwart.</p>

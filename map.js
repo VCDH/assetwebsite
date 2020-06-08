@@ -83,6 +83,13 @@ function initMap() {
 		updateMapStyle();
 		updateMapLayers();
 	});
+	map.on('contextmenu', function(e) {
+		console.log(e);
+		L.popup()
+		.setLatLng(e.latlng)
+		.setContent('<h1>' + e.latlng.lat.toFixed(6) + ',' + e.latlng.lng.toFixed(6) + '</h1><p><a href="https://www.google.nl/maps/?q=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;layer=c&cbll=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;cbp=11,' + 0 + ',0,0,5" target="_blank">Open locatie in Google Street View&trade;</a></p>')
+		.openOn(map);
+	})
 	//set map position from cookie, if any
 	if ((typeof onloadCookie !== 'undefined') && ($.isNumeric(onloadCookie[1]))) {
 		//get and use center and zoom from cookie
@@ -237,7 +244,7 @@ function loadMarkers(layer) {
 						title: v.code
 					});
 					marker.on('click', function(e) {
-					openMapPopup(e, v.id);
+						openMapPopup(e, v.id);
 					});
 					marker.on('contextmenu', function(e) {
 						openDetailsWindow(v.id);
