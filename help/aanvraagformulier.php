@@ -39,3 +39,9 @@
 
 <h2>Formele procedures</h2>
 <p>De formele procedures kunnen worden geraadpleegd op de <a href="procedures.php">pagina procedures</a> (inloggen vereist).</p>
+
+<h2>DRIP-selecties bewaren en opnieuw gebruiken</h2>
+<p>Een DRIP-selectie wordt automatisch bewaard zodra het aanvraagformulier wordt gedownload. Hierdoor kan een eerdere selectie later snel worden hergebruikt. Het is ook mogelijk om een selectie handmatig op te slaan middels de knop <i>Opslaan</i>; er kan dan tevens een naam worden opgegeven zodat de selectie later makkelijker terug te vinden is. Opgeslagen selecties zijn persoonlijk en gekoppeld aan je gebruikersaccount. Niet-ingelogde gebruikers kunnen geen gebruik maken van deze functie.</p>
+<p>Via de knop <i>Openen</i> kan een eerder opgeslagen selectie worden geladen. Er kan hierbij gekozen worden op de opgeslagen selectie te openen zodat deze aangepast kan worden. Opslaan overschrijft in dit geval dan de geopende selectie. Daarnaast kan er voor worden gekozen om een opgeslagen selectie te dupliceren. Bij opslaan wordt de aangepaste selectie dan onder een andere naam opgeslagen en blijft de oorspronklijk opgeslagen selectie ongewijzigd. Bij het openen van een opgeslagen selectie gaan eventuele niet-opgeslagen wijzigingen verloren.</p>
+<p>Via de knop <i>Nieuw</i> kunnen alle geselecteerde DRIPs in een keer worden gedeselecteerd. Niet-opgeslagen wijzigingen zullen hierbij verloren gaan.</p>
+<p>Het is op dit moment niet mogelijk om een opgeslagen selectie te verwijderen.</p>

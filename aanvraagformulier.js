@@ -67,6 +67,7 @@ var maplayers = {};
 var table;
 var selectedMarkerIds = [];
 var layer = 1; //TODO dit veronderstelt dat DRIP layer laag 1 is, wat zo is in default install
+var savedFormId = 0;
 
 /*
 * Initialize the map on page load
@@ -197,6 +198,9 @@ function loadMarkers(layer) {
 	});
 }
 
+/*
+* select or unselect a marker
+*/
 function changeSelection(id) {
     id = parseInt(id);
     var marker;
@@ -237,13 +241,197 @@ function changeSelection(id) {
         //remove from table selection
         table.deselectRow(rowId);
     }
+    //update count
+    $('#requestform-count').html(selectedMarkerIds.length);
+    //enable/disable buttons
+    if (selectedMarkerIds.length > 0) {
+        $('#aanvraagformulier-download').prop('disabled', false);
+        $('#requestform-save').prop('disabled', false);
+        $('#requestform-new').prop('disabled', false);
+    }
+    else {
+        $('#aanvraagformulier-download').prop('disabled', true);
+        $('#requestform-save').prop('disabled', true);
+        if (savedFormId == 0) {
+            $('#requestform-new').prop('disabled', true);
+        }
+    }
     console.log(selectedMarkerIds);
+}
+
+/*
+* save requestform selection
+*/
+function saveRequestform() {
+//check if any selection
+    if (selectedMarkerIds.length <= 0) {
+        alert('Kan geen formulier opslaan zonder DRIP-selectie');
+    }
+    else {
+        $.getJSON($(this).attr('href'), { do: 'save', id: savedFormId, name: $('#requestform-name').val(), assets: JSON.stringify(selectedMarkerIds) })
+        .done (function(json) {
+            savedFormId = json.id;
+        })
+        .fail (function() {
+            alert('Kan niet opslaan');
+        });
+    }
+}
+
+/*
+* load requestform by id
+*/
+function loadRequestform(id, duplicate) {
+    //get asset ids to be selected
+     $.getJSON($(this).attr('href'), { do: 'load', id: id })
+     .done (function(json) {
+         console.log(json.assetids);
+        //set selected
+        for (i = 0; i < json.assetids.length; i++) {
+            changeSelection(json.assetids[i]);
+        }
+        //if duplicated
+        if (duplicate == true) {
+            savedFormId = 0;
+            $('#requestform-name').val(json.name + ' - kopie');
+        }
+        else {
+        savedFormId = json.id;
+        $('#requestform-name').val(json.name);
+        }
+     })
+     .fail (function() {
+        alert('Kan niet laden');
+     })
+     .always (function () {
+
+     }); 
+}
+
+/*
+* GUI for saving a requestform including changing its name
+*/
+function openSaveRequestformGUI() {
+    $('#requestform-save-gui').dialog({
+        resizable: false,
+        title: "Opslaan",
+        height: "auto",
+        width: 400,
+        modal: true,
+        position: { my: "center", at: "center", of: window },
+        buttons: {
+            "Opslaan": function() {
+                saveRequestform();
+                $(this).dialog("close");
+            },
+            "Annuleren": function() {
+                $(this).dialog("close");
+             }
+        }
+    });
+    $('#requestform-name').select();
+}
+
+/*
+* GUI for opening a saved requestform
+*/
+function openLoadRequestformGUI() {
+    //load dialog contents
+    var temp_selectedId = 0;
+    //get json content
+    $.getJSON($(this).attr('href'), { data: 'open-list' })
+    .done (function(tabledata) {
+        //create Tabulator on DOM element with id "example-table"
+        var table = new Tabulator('#requestform-saved-list', {
+            selectable: 1,
+            data: tabledata, //assign data to table
+            layout: 'fitColumns', //fit columns to width of table (optional)
+            columns: [ //Define Table Columns
+                { title: 'naam', field: 'name', widthGrow: 1 },
+                { title: 'gewijzigd', field: 'date_edit', width: 120 }
+            ],
+            rowClick: function(e, row) {
+                temp_selectedId = row._row.data.id;
+            }
+        });
+    })
+    .fail (function() {
+        $('#requestform-saved-list').html('Kan tabelgegevens niet laden.');
+    })
+    .always (function () {
+        $('#requestform-open-gui').dialog({
+            resizable: false,
+            title: "Openen",
+            height: "auto",
+            width: 440,
+            modal: true,
+            position: { my: "center", at: "center", of: window },
+            buttons: {
+                "Openen": function() {
+                    //unload all selected
+                    unloadAllSelectedMarkerIds();
+                    loadRequestform(temp_selectedId, false);
+                    $(this).dialog("close");
+                },
+                "Dupliceren": function() {
+                    //unload all selected
+                    unloadAllSelectedMarkerIds();
+                    loadRequestform(temp_selectedId, true);
+                    $(this).dialog("close");
+                },
+                "Annuleren": function() {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }); 
+}
+
+/*
+* GUI starting a new requestform and discarding previous selection
+*/
+function openNewRequestformGUI() {
+    $('#requestform-new-gui').dialog({
+        resizable: false,
+        title: "Nieuw",
+        height: "auto",
+        width: 400,
+        modal: true,
+        position: { my: "center", at: "center", of: window },
+        buttons: {
+            "Doorgaan": function() {
+                //unload all selected
+                unloadAllSelectedMarkerIds();
+                savedFormId = 0;
+                $('#requestform-new').prop('disabled', true);
+                $('#requestform-name').val('Nieuw Aanvraagformulier');
+                $(this).dialog("close");
+            },
+            "Annuleren": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+}
+
+/*
+* unset all selected markers
+*/
+function unloadAllSelectedMarkerIds() {
+    for (i = (selectedMarkerIds.length - 1); i >= 0; i--) {
+        changeSelection(selectedMarkerIds[i]);
+    }
 }
 
 /*
 * document.ready
 */
 $(document).ready( function() {
+    //disable buttons for there is no selection
+    $('#aanvraagformulier-download').prop('disabled', true);
+    $('#requestform-save').prop('disabled', true);
+    $('#requestform-new').prop('disabled', true);
+    
     //get json content
     $.getJSON($(this).attr('href'), { data: 'json' })
     .done (function(tabledata) {
@@ -300,7 +488,20 @@ $(document).ready( function() {
 			alert('Selecteer de DRIPs die moeten worden opgenomen in het aanvraagformulier.');
 		}
         else {
+            saveRequestform();
             window.open('docx.php?s=' + JSON.stringify(selectedMarkerIds));
         }
+    });
+    //new button
+    $('#requestform-new').click( function() {
+        openNewRequestformGUI();
+    });
+    //open button
+    $('#requestform-open').click( function() {
+        openLoadRequestformGUI();
+    });
+    //save button
+    $('#requestform-save').click( function() {
+        openSaveRequestformGUI();
     });
 });

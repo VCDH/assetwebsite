@@ -266,6 +266,33 @@ $qry[] = "INSERT INTO `".$db['prefix']."addfield`
 	(4, 'iVRI', 'bool', NULL, 1, 1, 0, 0), 
 	(4, 'TLC-ID', 'text', NULL, 0, 2, 0, 0)";
 
+$qry[] = "CREATE TABLE IF NOT EXISTS `".$db['prefix']."requestforms` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` TINYTEXT NOT NULL,
+	`shared` BOOLEAN NOT NULL DEFAULT 0,
+	`archive` BOOLEAN NOT NULL DEFAULT 0,
+	`organisation` INT UNSIGNED NOT NULL,
+	`user_edit` INT NOT NULL,
+	`date_edit` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`user_create` INT NOT NULL,
+	`date_create` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`)
+	)
+	ENGINE=MyISAM";
+
+$qry[] = "CREATE TABLE IF NOT EXISTS `".$db['prefix']."requestformassets` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`requestform` INT UNSIGNED NOT NULL,
+	`asset` INT UNSIGNED NULL,
+	`image` TINYTEXT NOT NULL,
+	`user_edit` INT NOT NULL,
+	`date_edit` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`user_create` INT NOT NULL,
+	`date_create` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`)
+	)
+	ENGINE=MyISAM";
+
 foreach($qry as $qry_this) {
 	$res = @mysqli_query($db['link'], $qry_this);
 	//get table name

@@ -62,6 +62,147 @@ if ($_GET['data'] == 'json') {
 	}
 	exit;
 }
+//provide json table content
+elseif ($_GET['data'] == 'open-list') {
+    //build asset table
+    //TODO: er wordt verondersteld dat DRIP asset type id 1 heeft
+	$json = array();
+	$qry = "SELECT `id`, `name`, `date_edit`
+	FROM `".$db['prefix']."requestforms`
+	WHERE `user_create` = " . getuserdata('id') . "
+	ORDER BY `date_edit` DESC, `name`";
+	//voer query uit
+	$res = mysqli_query($db['link'], $qry);
+	//als er een of meer rijen zijn
+	if (mysqli_num_rows($res) > 0) {
+		//lus om alle rijen weer te geven
+		while ($data = mysqli_fetch_assoc($res)) {
+			$json[] = array(
+				'id' => htmlspecialchars($data['id']),
+				'name' => htmlspecialchars($data['name']),
+				'date_edit' => htmlspecialchars($data['date_edit'])
+			);
+		}
+
+		header('Content-Type: application/json');
+		echo json_encode($json);
+	}
+	exit;
+}
+//save selection
+elseif ($_GET['do'] == 'save') {
+	//check login
+	if ($login !== TRUE) {
+		exit;
+	}
+
+	$json = false;
+	if (is_numeric($_GET['id'])) {
+		$requestform_id = (int) $_GET['id'];
+	}
+	else {
+		$requestform_id = 0;
+	}
+	//check if there is a save with this id
+	$qry = "SELECT `id`
+	FROM `".$db['prefix']."requestforms`
+	WHERE `id` = '" . $requestform_id . "'
+	AND `user_create` = " . getuserdata('id');
+	$res = mysqli_query($db['link'], $qry);
+	if (mysqli_num_rows($res)) {
+		//update existing
+		$qry = "UPDATE `".$db['prefix']."requestforms`
+		SET `name` =  '" . mysqli_real_escape_string($db['link'], $_GET['name']) . "'
+		WHERE `id` = '" . $requestform_id . "'";
+		$res = mysqli_query($db['link'], $qry);
+		if ($res == FALSE) {
+			//check provided ids
+			$requestform_id = 0;
+		}
+	}
+	if ($requestform_id == 0) {
+		//create new
+		$qry = "INSERT INTO `".$db['prefix']."requestforms`
+		SET `name` =  '" . mysqli_real_escape_string($db['link'], $_GET['name']) . "',
+		`organisation` = '" . getuserdata('organisation') . "',
+		`user_edit` = '" . getuserdata('id') . "',
+		`user_create` = '" . getuserdata('id') . "'";
+		mysqli_query($db['link'], $qry);
+		$requestform_id = mysqli_insert_id($db['link']);
+	}
+
+	//insert ids
+	if ($requestform_id > 0) {
+		$assets = json_decode($_GET['assets'], TRUE);
+		$assets_checked = array();
+		if (is_array($assets)) {
+			foreach ($assets as $asset) {
+				if (is_numeric($asset) && !in_array($asset, $assets_checked)) {
+					$assets_checked[] = $asset;
+				}
+			}
+			if (count($assets_checked) > 0) {
+				//insert into database
+				$qry = "DELETE FROM `".$db['prefix']."requestformassets`
+				WHERE `requestform` = '" . $requestform_id . "'";
+				mysqli_query($db['link'], $qry);
+				foreach ($assets_checked as $asset) {
+					$qry = "INSERT INTO `".$db['prefix']."requestformassets`
+					SET `requestform` = '" . $requestform_id . "',
+					`asset` = '" . $asset . "',
+					`user_edit` = '" . getuserdata('id') . "',
+					`user_create` = '" . getuserdata('id') . "'";
+					mysqli_query($db['link'], $qry);
+				}
+			}
+		}
+	}
+	//return save id
+	header('Content-Type: application/json');
+	echo json_encode(array('id' => $requestform_id));
+	exit;
+}
+//save selection
+elseif ($_GET['do'] == 'load') {
+	//check login
+	if ($login !== TRUE) {
+		exit;
+	}
+	
+	$json = array('id' => 0, 'name' => 'Nieuw Aanvraagformulier', 'assetids' => array());
+
+	if (is_numeric($_GET['id'])) {
+		$requestform_id = (int) $_GET['id'];
+	}
+	else {
+		$requestform_id = 0;
+	}
+	//check if there is a save with this id
+	$qry = "SELECT `id`, `name`
+	FROM `".$db['prefix']."requestforms`
+	WHERE `id` = '" . $requestform_id . "'
+	AND `user_create` = " . getuserdata('id');
+	$res = mysqli_query($db['link'], $qry);
+	if (mysqli_num_rows($res)) {
+		$data = mysqli_fetch_assoc($res);
+		$json['id'] = (int) $data['id'];
+		$json['name'] = htmlspecialchars($data['name']);
+		//get asset ids
+		$qry = "SELECT `asset` 
+		FROM `".$db['prefix']."requestformassets`
+		WHERE `requestform` = '" . $requestform_id . "'";
+		$res = mysqli_query($db['link'], $qry);
+		if (mysqli_num_rows($res)) {
+			while ($data = mysqli_fetch_assoc($res)) {
+				$json['assetids'][] = (int) $data['asset'];
+			}
+		}
+	}
+	//return json
+	header('Content-Type: application/json');
+	echo json_encode($json);
+	exit;
+}
 
 ?>
 <!DOCTYPE html>
@@ -89,15 +230,37 @@ if ($_GET['data'] == 'json') {
     <img style="float:left;" src="style/logo.png" width="195" height="101" alt="Logo BEREIK!">
     <h1 style="float:left; padding-top: 20px">Aanvraagformulier DRIP-teksten</h1>
     <p class="warning" style="clear:both;">Dit aanvraagformulier is in gebruik bij wegbeheerders in Zuid-Holland die verenigd zijn in het samenwerkingsplatform <a href="https://www.bereiknu.nl/" target="_blank">BEREIK!</a>. Voor andere regio's kunnen andere procedures van toepassing zijn.</p>
+	<fieldset>
+		Aantal geselecteerd: <span id="requestform-count">0</span> <input type="button" id="aanvraagformulier-download" value="Aanvraagformulier downloaden">
+		<?php
+		if ($login === TRUE) {
+			?>
+			<br><br>
+			<input type="button" id="requestform-new" value="Nieuw"> <input type="button" id="requestform-open" value="Openen"> <input type="button" id="requestform-save" value="Opslaan"> 
+			<?php
+		}
+		?>
+	</fieldset>
     <div style="float:left; clear:both;"><p><input type="search" id="table-filter" placeholder="filtertekst"></p></div>
-    <div id="assettable" style="height: calc(100vh - 300px); width:100%; clear: both;"></div>
-    <p><input type="button" id="aanvraagformulier-download" value="Aanvraagformulier downloaden"></p>
+    <div id="assettable" style="height: calc(100vh - 440px); width:100%; clear: both;"></div>
 </div>
 <div id="map" style="height:100vh; width: 67%; max-width: calc(100% - 340px); float:left; z-index: 0"></div>
 
 <?php
 include('menu.inc.php');
 ?>
+
+<div id="requestform-save-gui" style="display: none;">
+	<label for="requestform-name">Naam:</label> <input type="text" value="Nieuw Aanvraagformulier" name="requestform-name" id="requestform-name">
+</div>
+
+<div id="requestform-open-gui" style="display: none;">
+	<div id="requestform-saved-list" style="height: 300px; width:400px; clear: both;"></div>
+</div>
+
+<div id="requestform-new-gui" style="display: none;">
+	<p>Eventuele niet-opgeslagen wijzigingen zullen verloren gaan.</p>
+</div>
 
 </body>
 </html>
