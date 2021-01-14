@@ -99,17 +99,31 @@ if (($_GET['do'] == 'organisationedit') && (!empty($_POST))) {
 	if (!preg_match('/[0-9A-Z]{6}/i', $_POST['bordercolor']) && !empty($_POST['bordercolor'])) $fieldcheck = FALSE;
 	if (!preg_match('/[0-9A-Z]{6}/i', $_POST['fillcolor']) && !empty($_POST['fillcolor'])) $fieldcheck = FALSE;
 	//check organisation
-	$qry = "SELECT `id` FROM `".$db['prefix']."organisation`
+	$qry = "SELECT `id`, `bordercolor`, `fillcolor` FROM `".$db['prefix']."organisation`
 	WHERE `id` = '" . mysqli_real_escape_string($db['link'], $_GET['id']) . "'
 	LIMIT 1";
 	$res = mysqli_query($db['link'], $qry);
-	$row = mysqli_fetch_row($res);
-	if (!accesslevelcheck('organisaties_beheren_alle') && !accesslevelcheck('organisaties_beheren_eigen', $row[0])) {
+	$data = mysqli_fetch_assoc($res);
+	if (!accesslevelcheck('organisaties_beheren_alle') && !accesslevelcheck('organisaties_beheren_eigen', $data['id'])) {
 		$fieldcheck = FALSE;
 		$organisatie_gewijzigd = FALSE;
 	}
+	
 	//save data
 	if ($fieldcheck == TRUE) {
+		//check if colors changed, if so delete icons from cache
+		if (($_POST['bordercolor'] != $data['bordercolor']) || ($_POST['fillcolor'] != $data['fillcolor'])) {
+			$dir = 'images';
+			$files = scandir($dir);
+			foreach ($files as $file) {
+				if (is_file($dir . '/' . $file)) {
+					if (preg_match('/^\d+_' . $data['id'] . '(_\d+)?\.png$/', $file)) {
+						unlink($dir . '/' . $file);
+					}
+				}
+			}
+		}
+		
 		if (is_numeric($_GET['id'])) {
 			//query om rij aan te passen
 			$qry = "UPDATE `".$db['prefix']."organisation`
