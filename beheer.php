@@ -180,8 +180,11 @@ if (accesslevelcheck('gebruikers_beheren_eigen') && (($_GET['do'] == 'userlist')
 	$sql = "SELECT `".$db['prefix']."user`.`id` AS `id`, `".$db['prefix']."user`.`name` AS `name`, `".$db['prefix']."user`.`email` AS `email`, `".$db['prefix']."user`.`phone` AS `phone`, `".$db['prefix']."user`.`accesslevel` AS `accesslevel`, `".$db['prefix']."organisation`.`name` AS `organisation`, `".$db['prefix']."user`.`organisation` AS `organisation_id`, `".$db['prefix']."user`.`lastlogin` AS `lastlogin`
 	FROM `".$db['prefix']."user`
 	LEFT JOIN `".$db['prefix']."organisation`
-	ON `".$db['prefix']."user`.`organisation` = `".$db['prefix']."organisation`.`id`
-	ORDER BY `name`";
+	ON `".$db['prefix']."user`.`organisation` = `".$db['prefix']."organisation`.`id`";
+	if (!accesslevelcheck('gebruikers_beheren_alle')) {
+		$sql .= " WHERE `organisation` = '" . getuserdata('organisation') . "'";
+	}
+	$sql .= " ORDER BY `name`";
 	//voer query uit
 	$result = mysqli_query($db['link'], $sql);
 	//als er een of meer rijen zijn
