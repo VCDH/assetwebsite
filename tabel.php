@@ -248,7 +248,8 @@ elseif ($_GET['data'] == 'details') {
 		$html .= '<input type="hidden" id="longitude" value="' . htmlspecialchars($data['longitude']) . '">';
 		$html .= '<input type="hidden" id="heading" value="' . htmlspecialchars($data['heading']) . '">';
 
-		$html .= '<p><a href="index.php?id='.$data['assetid'].'">Centreer locatie op kaart</a></p>';
+		$html .= '<p><a href="index.php?id='.$data['assetid'].'">Centreer locatie op kaart</a><br>';
+		$html .= '<a href="https://www.google.nl/maps/?q=' . $data['latitude'] . ',' . $data['longitude'] . '&amp;layer=c&cbll=' . $data['latitude'] . ',' . $data['longitude'] . '&amp;cbp=11,' . $data['heading'] . ',0,0,5" target="_blank">Open locatie in Google Street View&trade;</a></p>';
 		if (getuserdata()) {
 			//rapporteer fout via edit.php
 			$html .= '<p><a href="edit.php?do=report&amp;id='.$data['assetid'].'">Foutieve informatie melden</a></p>';
