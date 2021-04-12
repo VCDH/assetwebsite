@@ -1,0 +1,166 @@
+JSON toegang assetwebsite
+=========================
+
+De actuele assets kunnen worden opgehaald in JSON formaat.
+
+
+Toegang
+-------
+De data kan worden opgevraagd via de URL http://assets.vcdh.nl/tabel.php?download=json
+
+Wanneer niet is ingelogd worden enkel de gegevens van publieke kaartlagen gegeven. Op het moment van schrijven zijn enkel gegevens over camera's niet publiek.
+Als je ook de niet-publieke gegevens geautomatiseerd wil ophalen, zul je met CURL ofzo eerst de login van http://assets.vcdh.nl/login.php moeten passeren en de hierbij ontvangen cookies moeten meegeven bij het opvragen van de JSON data.
+
+
+Formaat
+-------
+De data wordt gegeven in JSON formaat met hierin een enkelvoudige array met objecten per asset.
+(optioneel) betekent dat de velden niet verplicht zijn ingevuld en dus een lege string of 0 kunnen zijn.
+
+### Standaard naam/waardeparen
+
+Aanwezig voor iedere asset:
+
+* "assetid":                 (int) uniek id van asset, constant over de tijd
+* "assettypename":           enum(CAM,DRIP,PRIS,TDI,TWI,VRI) type asset, dit bepaalt ook welke aanvullende velden een asset kan hebben
+* "code":                    (string) code/nummer van asset
+* "naam":                    (string) (optioneel) omschrijving van locatie van asset
+* "status":                  enum('bestaand','realisatie','buiten gebruik','verwijderd') status van asset, verwijderde assets blijven altijd in de database
+* "aansturing":              (string) naam van organisatie verantwoordelijk voor aansturing van asset
+* "wegbeheerder":            (string) naam van wegbeheerder die eigenaar is van het grondgebied waarop de asset staat
+* "onderhoud":               (string) naam van organisatie verantwoordelijk voor onderhoud van asset
+* "voeding":                 (string) naam van organisatie verantwoordelijk voor energievoorziening van asset
+* "verbinding":              (string) naam van organisatie verantwoordelijk voor dataverbinding van asset
+* "leverancier":             (string) leverancier van asset
+* "bouwjaar":                (int) (optioneel) bouwjaar van huidige installatie
+* "oorspronkelijk_bouwjaar": (int) (optioneel) bouwjaar van eerste installatie op deze locatie
+* "latitude":                (double) latitude
+* "longitude":               (double) longitude
+* "heading":                 (int) rijrichting in graden waarvoor dit asset bedoeld is. Enkel relevant voor DRIP en PRIS, maar ook aanwezig bij andere typen. 0=zuid->noord, 90=west->oost, etc.
+* "memo":                    (string) (optioneel) memoveld
+
+
+### CAM
+
+Aanvullend aanwezig voor assettype camera:
+
+* "PTZ":                     (bool) 1=camera beschikt over pan, tilt, zoom; 0=camera beschikt niet over ptz
+
+
+### DRIP
+
+Aanvullend aanwezig voor assettype dynamisch routeinformatiepaneel:
+
+* "project":                 (string) (optioneel) project waarin deze DRIP is gerealiseerd
+* "weg":                     (string) (optioneel) wegnummer waarlangs DRIP is geplaatst
+* "richting":                (string) (optioneel) letter van rijbaan waarlangs DRIP is geplaatst
+* "hectometer":              (string) (optioneel) hectometerpositie waarop DRIP is geplaatst
+* "type":                    (string) (optioneel) type van DRIP
+* "template":                (string) (optioneel) voorkeurstemplate voor DRIP
+* "standaardtekst":          (string) (optioneel) PHP-serialized array met tekst en/of afbeelding van standaardbeeld van DRIP (bijvoorbeeld reistijdinformatie)
+* "bewegwijzering":          (string) (optioneel) PHP-serialized array met tekst en/of afbeelding van bewegwijzering die relevant is voor de locatie van deze DRIP
+
+
+### PRIS
+
+Aanvullend aanwezig voor assettype parkeerrouteinformatiesysteem:
+
+* "afbeelding":              (string) (optioneel) PHP-serialized array met tekst en/of afbeelding van PRIS-locatie
+
+
+### TDI
+
+Aanvullend aanwezig voor assettype toeritdoseerinstallatie:
+
+* "iVRI":                    (bool) 1=is iVRI; 0=geen iVRI
+* "TLC-ID":                  (string) (optioneel) TLC-ID van iVRI
+
+
+### TWI
+
+Assettype tramwaarschuwingsinstallatie heeft geen aanvullende velden.
+
+
+### VRI
+
+Aanvullend aanwezig voor assettype verkeersregelinstallatie:
+
+* "iVRI":                    (bool) 1=is iVRI; 0=geen iVRI
+* "TLC-ID":                  (string) (optioneel) TLC-ID van iVRI
+
+
+
+Voorbeeld
+---------
+
+    [
+        {
+            "assetid": 156,
+            "assettypename": "DRIP",
+            "code": "29021 Algeraweg",
+            "naam": "",
+            "status": "bestaand",
+            "aansturing": "Gemeente Rotterdam",
+            "wegbeheerder": "Gemeente Capelle a\/d IJssel",
+            "onderhoud": "Gemeente Rotterdam",
+            "voeding": "Gemeente Rotterdam",
+            "verbinding": "Gemeente Rotterdam",
+            "leverancier": "Solari",
+            "bouwjaar": 2012,
+            "oorspronkelijk_bouwjaar": 2012,
+            "latitude": 51.9184385409548,
+            "longitude": 4.57434619181822,
+            "heading": 310,
+            "memo": "",
+            "project": "Gemeente Rotterdam (34)",
+            "weg": "",
+            "richting": "",
+            "hectometer": "",
+            "type": "stadsDRIP",
+            "template": "",
+            "standaardtekst": "a:1:{s:5:&quot;image&quot;;s:36:&quot;09530db31f4d64f6ceb986a6ad4cf0e9.png&quot;;}",
+            "bewegwijzering": ""
+        },
+    	{
+            "assetid": 1510,
+            "assettypename": "VRI",
+            "code": "K155",
+            "naam": "Escamplaan - Soestdijksekade",
+            "status": "bestaand",
+            "aansturing": "Gemeente Den Haag",
+            "wegbeheerder": "Gemeente Den Haag",
+            "onderhoud": "Gemeente Den Haag",
+            "voeding": "Gemeente Den Haag",
+            "verbinding": "Gemeente Den Haag",
+            "leverancier": "PEEK",
+            "bouwjaar": 2009,
+            "oorspronkelijk_bouwjaar": 2009,
+            "latitude": 52.06321113779406,
+            "longitude": 4.273049588988731,
+            "heading": 0,
+            "memo": "",
+            "iVRI": "0",
+            "TLC-ID": ""
+        },
+    	{
+            "assetid": 2405,
+            "assettypename": "TDI",
+            "code": "002",
+            "naam": "A12 Zmeer-Oost ri. Den Haag",
+            "status": "bestaand",
+            "aansturing": "Rijkswaterstaat ZWN",
+            "wegbeheerder": "Rijkswaterstaat ZWN",
+            "onderhoud": "Rijkswaterstaat ZWN",
+            "voeding": "Rijkswaterstaat WNZ",
+            "verbinding": "Rijkswaterstaat VWM",
+            "leverancier": "Dynniq",
+            "bouwjaar": 2011,
+            "oorspronkelijk_bouwjaar": 2011,
+            "latitude": 52.045283,
+            "longitude": 4.506495,
+            "heading": 0,
+            "memo": "Onderhoud ZWN VODK",
+            "iVRI": "0",
+            "TLC-ID": ""
+        }
+    ]
