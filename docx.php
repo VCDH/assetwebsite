@@ -145,7 +145,7 @@ if (is_array($drip_list)) {
         }
     }
     
-    $qry = "SELECT `code`, `t_aansturing`.`name` AS `aansturing`, `t_type`.`content` AS `type`, `t_template`.`content` AS `template`, `".$db['prefix']."asset`.`id` AS `assetid`, `t_aansturing`.`id` AS `aansturing_id` 
+    $qry = "SELECT `code`, `t_aansturing`.`name` AS `aansturing`, `t_type`.`content` AS `type`, `t_template`.`content` AS `template`, `".$db['prefix']."asset`.`id` AS `assetid`, `t_aansturing`.`id` AS `aansturing_id`, `status` 
     FROM `".$db['prefix']."asset`
     LEFT JOIN `".$db['prefix']."organisation` AS `t_aansturing`
 	ON `".$db['prefix']."asset`.`aansturing` = `t_aansturing`.`id`
@@ -179,6 +179,14 @@ if (is_array($drip_list)) {
             if (!in_array($data[5], $drip_list_aansturing)) {
                 $drip_list_aansturing[] = $data[5];
             } 
+            //status
+            switch($data[6]) {
+                case 1: $data[6] = 'bestaand'; break;
+                case 2: $data[6] = 'realisatie'; break;
+                case 3: $data[6] = 'buiten gebruik'; break;
+                case 4: $data[6] = 'verwijderd'; break;
+                default: break;
+            }
             //table contents
             $table->addRow(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(2));
             //aansturing
@@ -190,6 +198,8 @@ if (is_array($drip_list)) {
             $textrun->addLink(htmlspecialchars('http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')).'/').'?id='.$data[4], htmlspecialchars($data[0]), $styleFontLink);
             //(type)
             $cell->addText('(' . (empty($data[3]) ? htmlspecialchars($data[2]) : htmlspecialchars($data[3])) . ')', $styleFontDefault, $styleParNospace);
+            //status
+            $cell->addText(htmlspecialchars($data[6]), $styleFontSmallText, $styleParNospace);
             //gewenste tekst
             $table->addCell(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(7))->addText('', $styleFontArial, $styleParNospace); 
         }
