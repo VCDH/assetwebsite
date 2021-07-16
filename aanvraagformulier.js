@@ -26,7 +26,7 @@ var selectedTileLayer = 5;
 var tileLayers = [
 	{
 		name: 'BRT Achtergrondkaart',
-		layer: L.tileLayer('https://geodata.nationaalgeoregister.nl/tiles/service/wmts/brtachtergrondkaart/EPSG:3857/{z}/{x}/{y}.png', {
+		layer: L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', {
 			minZoom: 6,
 			maxZoom: 19,
 			bounds: [[50.5, 3.25], [54, 7.6]],
