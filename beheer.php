@@ -20,6 +20,7 @@
 session_start();
 include_once('getuserdata.inc.php');
 include_once('accesslevels.cfg.php');
+require 'config.inc.php';
 //redirect if not logged in
 logincheck();
 //include database gegevens
@@ -34,16 +35,18 @@ if (($_GET['do'] == 'useredit') && (!empty($_POST))) {
 	if (empty($_POST['email'])) $fieldcheck = FALSE;
 
 	//krijg organisatie van gebruiker
-	$qry = "SELECT `organisation` FROM `".$db['prefix']."user`
+	$qry = "SELECT `organisation`, `id` FROM `".$db['prefix']."user`
 	WHERE `id` = '" . mysqli_real_escape_string($db['link'], $_GET['id']) . "'";
 	$res = mysqli_query($db['link'], $qry);
 	if (mysqli_num_rows($res)) {
 		//bestaande gebruiker
 		$row = mysqli_fetch_row($res);
 		$vorige_organisatie = $row[0];
+		$user_id = $row[1];
 	}
 	else {
 		$vorige_organisatie = 0;
+		$user_id = NULL;
 	}
 	//controleer of bewerkt mag worden
 	if (
@@ -69,7 +72,7 @@ if (($_GET['do'] == 'useredit') && (!empty($_POST))) {
 
 	//save data
 	if ($fieldcheck == TRUE) {
-		if (is_numeric($_GET['id'])) {
+		if (is_numeric($user_id)) {
 			//query om rij aan te passen
 			$qry = "UPDATE `".$db['prefix']."user`
 			SET `name` = '" . mysqli_real_escape_string($db['link'], $_POST['name']) . "',
@@ -77,7 +80,8 @@ if (($_GET['do'] == 'useredit') && (!empty($_POST))) {
 			`phone` = '" . mysqli_real_escape_string($db['link'], $_POST['phone']) . "',
 			`organisation` = '" . mysqli_real_escape_string($db['link'], $_POST['organisation']) . "',
 			`accesslevel` = '" . mysqli_real_escape_string($db['link'], $_POST['accesslevel']) . "'
-			WHERE `id` = '" . mysqli_real_escape_string($db['link'], $_GET['id']) . "'";
+			WHERE `id` = '" . $user_id . "'";
+			$gebruiker_gewijzigd = mysqli_query($db['link'], $qry);
 		}
 		else {
 			$qry = "INSERT INTO `".$db['prefix']."user`
@@ -86,9 +90,25 @@ if (($_GET['do'] == 'useredit') && (!empty($_POST))) {
 			`phone` = '" . mysqli_real_escape_string($db['link'], $_POST['phone']) . "',
 			`organisation` = '" . mysqli_real_escape_string($db['link'], $_POST['organisation']) . "',
 			`accesslevel` = '" . mysqli_real_escape_string($db['link'], $_POST['accesslevel']) . "'";
+			$gebruiker_gewijzigd = mysqli_query($db['link'], $qry);
+			$user_id = mysqli_insert_id($db['link']);
 		}
-		//voer query uit
-		$gebruiker_gewijzigd = mysqli_query($db['link'], $qry);
+
+		//set new password
+		if (($gebruiker_gewijzigd == TRUE) && (!empty($_POST['password']))) {
+			if (strlen($_POST['password']) < $cfg['account']['pass_minlength']) {
+				$wachtwoord_gewijzigd = FALSE;
+			}
+			else {
+				$new_password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+				//query
+				$sql = "UPDATE `".$db['prefix']."user`
+				SET `password` = '" . mysqli_real_escape_string($db['link'], $new_password_hash) . "'
+				WHERE `id` = '" . $user_id . "'";
+				$wachtwoord_gewijzigd = mysqli_query($db['link'], $sql);	
+			}
+		}
+		
 	}
 }
 //verwerk organisatiewijziging
@@ -176,6 +196,9 @@ if (accesslevelcheck('gebruikers_beheren_eigen') && (($_GET['do'] == 'userlist')
 	if ($gebruiker_gewijzigd === TRUE) {
 		echo '<p class="success">Gebruikersgegevens gewijzigd!</p>';
 	}
+	if ($wachtwoord_gewijzigd === FALSE) {
+		echo '<p class="warning">Wachtwoord niet gewijzigd.</p>';
+	}
 	//query om inhoud van tabel te selecteren
 	$sql = "SELECT `".$db['prefix']."user`.`id` AS `id`, `".$db['prefix']."user`.`name` AS `name`, `".$db['prefix']."user`.`email` AS `email`, `".$db['prefix']."user`.`phone` AS `phone`, `".$db['prefix']."user`.`accesslevel` AS `accesslevel`, `".$db['prefix']."organisation`.`name` AS `organisation`, `".$db['prefix']."user`.`organisation` AS `organisation_id`, `".$db['prefix']."user`.`lastlogin` AS `lastlogin`
 	FROM `".$db['prefix']."user`
@@ -259,6 +282,7 @@ elseif (accesslevelcheck('gebruikers_beheren_eigen') && ($_GET['do'] == 'useredi
 	<table>
 	<tr><td>Naam:</td><td><input type="text" name="name" value="<?php echo htmlspecialchars($data['name']); ?>"></td></tr>
 	<tr><td>E-mail:</td><td><input type="text" name="email" value="<?php echo htmlspecialchars($data['email']); ?>"></td></tr>
+	<tr><td>Wachtwoord:</td><td><input type="text" name="password" minlength="<?php echo $cfg['account']['pass_minlength']; ?>"> Minimum <?php echo $cfg['account']['pass_minlength']; ?> tekens. Laat leeg om wachtwoord niet te wijzigen.</td></tr>
 	<tr><td>Telefoon:</td><td><input type="text" name="phone" value="<?php echo htmlspecialchars($data['phone']); ?>"></td></tr>
     <tr><td>Organisatie:</td><td><select name="organisation"><?php
 	$qry = "SELECT `id`, `name` FROM `".$db['prefix']."organisation`";
