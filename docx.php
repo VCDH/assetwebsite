@@ -42,11 +42,11 @@ $styleParH = array('spaceBefore' => \PhpOffice\PhpWord\Shared\Converter::pointTo
 $styleFontDefault = array('size' => 11, 'name' => 'Calibri');
 $styleFontArial = array('size' => 11, 'name' => 'Arial');
 $styleFontBold = array('size' => 11, 'name' => 'Calibri', 'bold' => true);
-$styleFontLink = array('size' => 11, 'name' => 'Calibri', 'bold' => true, 'underline' => 'single', 'color' => '005091');
+$styleFontLink = array('size' => 11, 'name' => 'Calibri', 'bold' => true, 'underline' => 'single', 'color' => '72A32D');
 $styleFontSmallText = array('size' => 9, 'name' => 'Calibri');
 //heading
-$styleFontH1 = array('size' => 16, 'name' => 'Calibri Light', 'color' => '9AC61E');
-$styleFontH2 = array('size' => 13, 'name' => 'Calibri Light', 'color' => '86C3E7');
+$styleFontH1 = array('size' => 16, 'name' => 'Calibri Light', 'color' => '1D3A8F');
+$styleFontH2 = array('size' => 13, 'name' => 'Calibri Light', 'color' => 'E6007E');
 $phpWord->addTitleStyle(1, $styleFontH1, $styleParH);
 $phpWord->addTitleStyle(2, $styleFontH2, $styleParH);
 
@@ -56,14 +56,14 @@ $section = $phpWord->addSection();
 
 //header
 $header = $section->addHeader();
-$header->addText('Aanvraagformulier DRIP-teksten BEREIK! versie 2.0.1', $styleFontSmallText, array('align' => 'right'));
+$header->addText('Aanvraagformulier DRIP-teksten Zuid-Holland Bereikbaar versie 3.0.0', $styleFontSmallText, array('align' => 'right'));
 //footer
 $footer = $section->addFooter();
 $footer->addPreserveText(htmlspecialchars('Formulier gegenereerd op '.date('d-m-Y') .'. Pagina {PAGE} van {NUMPAGES}'), $styleFontSmallText, array('align' => 'right'));
 
 
-$section->addTitle('Aanvraagformulier DRIP-teksten BEREIK!', 1);
-$section->addText('Dit aanvraagformulier is in gebruik bij wegbeheerders in Zuid-Holland die verenigd zijn in het samenwerkingsplatform BEREIK!. Voor andere regio\'s kunnen andere procedures van toepassing zijn. Het blijft de verantwoordelijkheid van de aanvrager om DRIP-aanvragen op de juiste manier bij de juiste partijen in te dienen.', $styleFontDefault);
+$section->addTitle('Aanvraagformulier DRIP-teksten Zuid-Holland Bereikbaar', 1);
+$section->addText('Dit aanvraagformulier is in gebruik bij wegbeheerders die verenigd zijn in het samenwerkingsverband Zuid-Holland Bereikbaar. Voor andere regio\'s kunnen andere procedures van toepassing zijn. Het blijft de verantwoordelijkheid van de aanvrager om DRIP-aanvragen op de juiste manier bij de juiste partijen in te dienen.', $styleFontDefault);
 $section->addTitle('Gegevens van de aanvrager', 2);
 
 $table = $section->addTable('myTable');

@@ -1,7 +1,7 @@
 <?php 
 /*
  	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020,2022 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -229,7 +229,7 @@ elseif ($_GET['do'] == 'load') {
 <div id="content" style="height:100vh; width: calc(33% - 40px); min-width: 300px; margin:0; padding: 0 20px; float:left;">
     <img style="float:left;" src="style/logo.png" width="195" height="101" alt="Logo BEREIK!">
     <h1 style="float:left; padding-top: 20px">Aanvraagformulier DRIP-teksten</h1>
-    <p class="warning" style="clear:both;">Dit aanvraagformulier is in gebruik bij wegbeheerders in Zuid-Holland die verenigd zijn in het samenwerkingsplatform <a href="https://www.bereiknu.nl/" target="_blank">BEREIK!</a>. Voor andere regio's kunnen andere procedures van toepassing zijn.</p>
+    <p class="warning" style="clear:both;">Dit aanvraagformulier is in gebruik bij wegbeheerders die verenigd zijn in het samenwerkingsverband <a href="https://www.zuidhollandbereikbaar.nl/" target="_blank">Zuid-Holland Bereikbaar</a>. Voor andere regio's kunnen andere procedures van toepassing zijn.</p>
 	<fieldset>
 		Aantal geselecteerd: <span id="requestform-count">0</span> <input type="button" id="aanvraagformulier-download" value="Aanvraagformulier downloaden">
 		<?php
