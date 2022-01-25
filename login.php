@@ -1,11 +1,9 @@
 <?php
-
-//use PHPMailer\PHPMailer\PHPMailer; //TODO dit weghalen
 /*
  	fietsviewer - grafische weergave van fietsdata
 	Copyright (C) 2018 Gemeente Den Haag, Netherlands
 	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020, 2022 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -303,8 +301,6 @@ elseif ($_GET['do'] == 'lostpass') {
 //main login page
 else {
 	echo '<h1>Aanmelden</h1>';
-
-	echo '<p class="info"><b>De assetwebsite is vernieuwd!</b> Hiermee is ook de manier gewijzigd waarop wachtwoorden gecodeerd in de database worden opgeslagen. Hierdoor is het nodig om voor de eerste keer inloggen een <a href="?do=lostpass">nieuw wachtwoord aan te vragen</a>. Het nieuwe wachtwoord wordt direct toegezonden en kan vervolgens na inloggen gewijzigd worden in een wachtwoord naar keuze. <span class="closeparent">melding sluiten</span></p>';
 
 	if (in_array('login', $messages)) {
 		echo '<p class="error">E-mailadres/wachtwoord onjuist</p>';
