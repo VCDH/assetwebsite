@@ -1,7 +1,7 @@
 <?php
 /*
  	fietsviewer - grafische weergave van fietsdata
-    Copyright (C) 2018 Gemeente Den Haag, Netherlands
+    Copyright (C) 2018, 2022 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -49,8 +49,11 @@ function getuserdata($req = null) {
         if (in_array($req, array('id', 'token', 'accesslevel', 'organisation', 'email'))) {
             return $data[$req];
         }
-        else {
+        elseif (empty($req)) {
             return TRUE;
+        }
+        else {
+            return NULL;
         }
     }
     return FALSE;
