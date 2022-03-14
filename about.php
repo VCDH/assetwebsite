@@ -48,11 +48,14 @@ include('menu.inc.php');
     <h1>Fouten in locatie/details melden</h1>
     <p>De inhoud van de website, waaronder de locaties van de wegkantsystemen en de detailgegevens worden beheerd vanuit de verschillende organisaties. Functionaliteit om fouten te kunnen melden <a href="https://github.com/VCDH/assetwebsite/issues/1" target="_blank">wordt nog toegevoegd</a>.</p>
 
-    <h1>Beheer website</h1>
-    <p>Het technisch beheer van deze website wordt namens Zuid-Holland Bereikbaar gedaan door Jasper Vries. Meld technische problemen of wensen in de <a href="https://github.com/VCDH/assetwebsite/issues" target="_blank">issuetracker op GitHub</a>. Kijk eerst of er al een issue bestaat met dezelfde bug of wens alvorens een nieuw issue aan te maken.</p>
+    <h1>Bewerkrechten</h1>
+    <p>Wil je gegevens van assets op deze website kunnen beheren voor jouw organisatie? Maak dan eerst een account aan als je dat nog niet hebt, via de pagina <a href="login.php?do=signup">Aanmelden</a>. Daarna kun je, na te zijn aangemeld, bewerkrechten aanvragen via de pagina <a href="account.php">Account</a>.</p>
 
     <h1>Ik wil mijn assets ook op deze website</h1>
-    <p>Lijkt het je als wegbeheerder, binnen of buiten Zuid-Holland Bereikbaar, handig om je assets ook op deze website op te nemen? Neem dan contact op met jasper punt vries apenstaart denhaag punt nl voor de mogelijkheden. Het is ook mogelijk om als regio of individuele wegbeheerder gebruik te gaan maken van het DRIP-aanvraagformulier. Een bestaande lijst met assets kan in &eacute;&eacute;n keer worden ingelezen. Je blijft als wegbeheerder zelf verantwoordelijk voor het bijhouden van je eigen assets en krijgt hiervoor dan de nodige bewerkrechten.</p>
+    <p>Lijkt het je als wegbeheerder, binnen of buiten Zuid-Holland, handig om je assets ook op deze website op te nemen? Neem dan contact op met jasper punt vries apenstaart denhaag punt nl voor de mogelijkheden. Het is ook mogelijk om als regio of individuele wegbeheerder gebruik te gaan maken van het DRIP-aanvraagformulier. Een bestaande lijst met assets kan in &eacute;&eacute;n keer worden ingelezen. Je blijft als wegbeheerder zelf verantwoordelijk voor het bijhouden van je eigen assets en krijgt hiervoor dan de nodige bewerkrechten.</p>
+
+    <h1>Technisch beheer website</h1>
+    <p>Het technisch beheer van deze website wordt namens Zuid-Holland Bereikbaar gedaan door Jasper Vries. Meld technische problemen of wensen in de <a href="https://github.com/VCDH/assetwebsite/issues" target="_blank">issuetracker op GitHub</a>. Kijk eerst of er al een issue bestaat met dezelfde bug of wens alvorens een nieuw issue aan te maken.</p>
 
     <h1>Broncode</h1>
     <p>De broncode van deze website is open source en is gepubliceerd op <a href="https://github.com/VCDH/assetwebsite" target="_blank">GitHub</a>.</p>

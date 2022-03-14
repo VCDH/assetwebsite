@@ -1,7 +1,7 @@
 <?php 
 /*
  	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2016-2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2016-2022 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ require_once 'getuserdata.inc.php';
 logincheck();
 require 'dbconnect.inc.php';
 require 'config.inc.php';
+require 'accesslevels.cfg.php';
 
 /*
 * process password change
@@ -135,7 +136,7 @@ include('menu.inc.php');
     //change personal details
     elseif (($_GET['do'] == 'userprofile') && ($userprofile_gewijzigd !== TRUE)) {
         echo '<h1>Gebruikersprofiel wijzigen</h1>';
-        echo '<p>Wijzig via deze pagina de gegevens in je gebruikersprofiel. Deze worden op dit moment nergens voor gebruikt, maar kunnen handig zijn voor de beheerder binnen jouw organisatie.</p>';
+        echo '<p>Wijzig via deze pagina de gegevens in je gebruikersprofiel. Deze worden automatisch ingevuld in een DRIP-aanvraagformulier en kunnen handig zijn voor de beheerder binnen jouw organisatie. Invullen van deze gegevens is niet verplicht.</p>';
         //check if post data or get form database
 		if (!empty($_POST)) {
 			$data['name'] = htmlspecialchars($_POST['name']);
@@ -194,6 +195,26 @@ include('menu.inc.php');
         }
         else {
             echo '<p class="error">Er is een fout opgetreden bij het ophalen van gebruikersdata.</p>';
+        }
+        echo '<h2>Bewerkrechten</h2>';
+        echo '<p>Is het vanuit je functie nodig om gegevens van assets te kunnen wijzigen en/of om nieuwe assets toe te kunnen voegen? Je kunt de rechten hiervoor aanvragen via een beheerder vanuit je eigen organisatie. Hiervoor kun je terecht bij de volgende personen:</p>';
+
+        $qry = "SELECT `email`, `phone`, `name` FROM `".$db['prefix']."user`
+		WHERE `organisation` = " . getuserdata('organisation') . "
+        AND `accesslevel` >= " . $cfg_accesslevel['gebruikers_beheren_eigen'] . "
+        ORDER BY `name`";
+        $res = mysqli_query($db['link'], $qry);
+        if (mysqli_num_rows($res)) {
+            echo '<ul>';
+            while ($data = mysqli_fetch_assoc($res)) {
+                echo '<li>';
+                echo htmlspecialchars($data['name']) . ' <a href="mailto:' . htmlspecialchars($data['email']) . '">' . htmlspecialchars($data['email']) . '</a> ' . htmlspecialchars($data['phone']);
+                echo '</li>';
+            }
+            echo '</ul>';
+        }
+        else {
+            echo '<p class="error">Geen beheerder gevonden.</p>';
         }
     }
 	?>
