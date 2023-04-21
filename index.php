@@ -36,6 +36,7 @@ include('dbconnect.inc.php');
 <script src="bundled/leaflet/leaflet.js"></script>
 <script src="bundled/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
 <script src="map.js"></script>
+<script src="details.js"></script>
 <!-- <script src="search.js"></script>TODO misschien opnemen in map.js -->
 <script src="help.js"></script>
 </head>

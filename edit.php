@@ -27,8 +27,7 @@ $url_base = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0,
 $url_index = $url_base.'/index.php';
 
 //redirect if not logged in
-if ( (($_GET['do'] != 'report') && (!getuserdata() || !accesslevelcheck('beheer_eigen'))) 
-	|| (($_GET['do'] != 'report') && (!is_numeric($_GET['id']))) ) {
+if (!getuserdata() || !accesslevelcheck('beheer_eigen')) {
 	header('Location:'.$url_index);
 	exit;
 }

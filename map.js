@@ -390,56 +390,6 @@ function drawTileLayerGUI() {
 }
 
 /*
-* details window, same as in tabel.js, except for map display and request from tabel.php
-*/
-function openDetailsWindow(id) {
-    if ($('#detailsdialog').length == 0) {
-        $('html').append('<div id="detailsdialog"></div>');
-    }
-    $('#detailsdialog').html('');
-    $('#detailsdialog').dialog({
-        autoOpen: false,
-        title: 'laden...',
-        height: 'auto',
-        width: $(window).width() - 60,
-        height: $(window).height() - 60,
-        position: { my: 'center', at: 'center', of: window }
-    });
-    $("#detailsdialog").parent().css({position : 'fixed'}).end().dialog('open');
-    $.getJSON('tabel.php', { data: 'details', id: id } )
-    .done (function(json) {
-        $('#detailsdialog').html(json.html);
-        $('#detailsdialog').dialog('option', 'title', json.title);
-        //open map
-        initMiniMap();
-    })
-    .fail( function() {
-        $('#detailsdialog').html('Kan gegevens niet laden');
-        $('#detailsdialog').dialog('option', 'title', 'Fout');
-    });
-}
-/* minimap for contrent from tabel.php*/
-function initMiniMap() {
-    var minimapposition = [$('#latitude').val(), $('#longitude').val()];
-
-	var minimap = L.map('minimap').setView(minimapposition, 13);
-
-	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(minimap);
-    
-    L.marker(minimapposition, {
-		draggable: true, 
-		rotationAngle: $('#heading').val(),
-		rotationOrigin: 'center',
-		icon: L.icon({	
-			iconUrl: 'image.php?t=' + $('#assettype').val() + '&w=' + $('#aansturing').val(), 
-			iconSize: [16,16], 
-			className: 'L-icon-def' }),
-	}).addTo(minimap);
-}
-
-/*
 * document.ready
 */
 $(function() {
