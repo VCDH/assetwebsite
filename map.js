@@ -37,9 +37,9 @@ var tileLayers = [
 	},
 	{
 		name: 'Luchtfoto',
-		layer: L.tileLayer('https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg', {
+		layer: L.tileLayer('https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/{z}/{x}/{y}.jpeg', {
 			minZoom: 6,
-			maxZoom: 19,
+			maxZoom: 21,
 			bounds: [[50.5, 3.25], [54, 7.6]],
 			attribution: 'Kaartgegevens &copy; <a href="https://www.kadaster.nl">Kadaster</a>'
 		})
