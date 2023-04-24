@@ -22,6 +22,7 @@ include_once('getuserdata.inc.php');
 $login = getuserdata();
 //include database gegevens
 include('dbconnect.inc.php');
+include_once('config.inc.php');
 
 $url_base = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
 $url_index = $url_base.'/index.php';
@@ -110,120 +111,11 @@ if (is_numeric($data['assettype'])) {
 		$additionaldata['a_'.$dat2['id']] = $dat2['content'];
 	}
 	//generic fields
-	$genericfields = array (
-		array ('g_1', 'code', 'text', 1),
-		array ('g_2', 'naam', 'text', 0),
-		array ('latitude', 'latitude', 'number', 1, array('min' => 49, 'max' => 54, 'step' => 'any')),
-		array ('longitude', 'longitude', 'number', 1, array('min' => 3, 'max' => 7, 'step' => 'any')),
-		array ('heading', 'heading', 'number', 1, array('min' => 0, 'max' => 360)),
-		array ('g_3', 'status', 'status', 1),
-		array ('g_4', 'aansturing', 'wegbeheerder', 1),
-		array ('g_5', 'wegbeheerder', 'wegbeheerder', 1),
-		array ('g_6', 'onderhoud', 'wegbeheerder', 1),
-		array ('g_7', 'voeding', 'wegbeheerder', 1),
-		array ('g_8', 'verbinding', 'wegbeheerder', 1),
-		array ('g_9', 'leverancier', 'text', 0),
-		array ('g_10', 'bouwjaar', 'number', 0, array('min' => 1950, 'max' => date('Y') + 10)),
-		array ('g_11', 'oorspronkelijk_bouwjaar', 'number', 0, array('min' => 1950, 'max' => date('Y') + 10)),
-		array ('g_12', 'memo', 'mtext', 0),
-	);
+	$genericfields = $cfg['fields']['generic'];
 }
 
 //function to check submitted fields for validity
-function check_submitted_field($fieldid, $fieldname, $fieldclass, $fielddata, $fieldmandatory = 1, $fieldproperties = '') {
-	global $db;
-	$debug = TRUE;
-	//check mandatory fields
-	if (($fieldmandatory == TRUE) && (strlen(trim($fielddata)) <= 0)) {
-		if ($debug === TRUE) echo $fieldid . ' (empty)<br>';
-		return FALSE;
-	}
-	//number
-	if (($fieldclass == 'number') && !empty($fielddata)) {
-		if (!is_numeric($fielddata)) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
-			return FALSE;
-		}
-		else {
-			//check min if any
-			if (is_array($fieldproperties) && array_key_exists('min', $fieldproperties)) {
-				if ($fielddata <= $fieldproperties['min']) {
-					if ($debug === TRUE) echo $fieldid . '<br>';
-					return FALSE;
-				}
-			}
-			//check max if any
-			if (is_array($fieldproperties) && array_key_exists('max', $fieldproperties)) {
-				if ($fielddata >= $fieldproperties['max']) {
-					if ($debug === TRUE) echo $fieldid . '<br>';
-					return FALSE;
-				}
-			}
-			//TODO: check any if any
-		}
-	}
-	//text
-	if (($fieldclass == 'text') && !empty($fielddata)) {
-		if (strlen(trim($fielddata)) < 1) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
-			return FALSE;
-		}
-	}
-	//multiline text
-	if (($fieldclass == 'mtext') && !empty($fielddata)) {
-		if (strlen(trim($fielddata)) < 1) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
-			return FALSE;
-		}
-	}
-	//status
-	if (($fieldclass == 'status') && !empty($fielddata)) {
-		$stati = array(1 => 'bestaand', 2 => 'realisatie', 3 => 'buiten gebruik', 4 => 'verwijderd');
-		if (!array_key_exists($fielddata, $stati)) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
-			return FALSE;
-		}
-	}
-	//wegbeheerder
-	if (($fieldclass == 'wegbeheerder') && !empty($fielddata)) {
-		$qry2 = "SELECT `id` FROM `".$db['prefix']."organisation`
-		WHERE `id` = '" . mysqli_real_escape_string($db['link'], $fielddata) . "'";
-		$res2 = mysqli_query($db['link'], $qry2);
-		if (!mysqli_num_rows($res2)) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
-			return FALSE;
-		}
-	}
-	if (($fieldclass == 'drip_standaardtekst') || ($fieldclass == 'drip_bewegwijzering')) {
-		//check image file
-		if ($fielddata['unsetfile'] !== 'true') {
-			$max_filesize = 100*1024; //bytes
-			$ext_allowed = array('png', 'jpg', 'jpeg');
-			//if there is a file
-			if (!empty($_FILES[$fieldid . '_file']) && ($_FILES[$fieldid . '_file']['error'] !== UPLOAD_ERR_NO_FILE)) {
-				//check upload errors
-				if ($_FILES[$fieldid . '_file']['error'] !== UPLOAD_ERR_OK) {
-					if ($debug === TRUE) echo $fieldid . '(uplerr ' . $_FILES[$fieldid . '_file']['error'] . ' https://www.php.net/manual/en/features.file-upload.errors.php)<br>';
-					return FALSE;
-				}
-				//check size
-				if ($_FILES[$fieldid . '_file']['size'] > $max_filesize) {
-					if ($debug === TRUE) echo $fieldid . '(size)<br>';
-					return FALSE;
-				}
-				//check file extension
-				$ext = strtolower(substr($_FILES[$fieldid . '_file']['name'], strrpos($_FILES[$fieldid . '_file']['name'], '.') + 1));
-				//controleer of extensie toegestaan
-				if (!in_array($ext, $ext_allowed)) {
-					if ($debug === TRUE) echo $fieldid . '(ext)<br>';
-					return FALSE;
-				}
-			}
-		}
-	}
-	//if all passed, field is valid:
-	return TRUE;
-}
+require_once('functions/assets.php');
 
 //function to process file upload
 //returns FALSE on failure or image filename on success
