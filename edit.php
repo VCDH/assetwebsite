@@ -399,7 +399,6 @@ if (!empty($_POST)) {
 					`content` = " . $content . ", 
 					`date_edit` = NOW(),
 					`user_edit` = '" . getuserdata('id') . "'";
-					echo $qry;
 					$res = mysqli_query($db['link'], $qry);
 				}
 			}
@@ -431,7 +430,6 @@ if (!empty($_POST)) {
 						`user_edit` = '" . getuserdata('id') . "',
 						`date_create` = NOW(),
 						`user_create` = '" . getuserdata('id') . "'";
-						echo $qry;
 						$res = mysqli_query($db['link'], $qry);
 					}
 				}

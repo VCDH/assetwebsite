@@ -67,3 +67,30 @@ function csv_terminator_from_string($line) {
         return FALSE;
     }
 }
+
+/*
+* function to get column names from header row, assuming first row is a header row of given csv file
+* returns (bool) FALSE if the file is wrong or (arr) $colnames if the file is correct
+*/
+function csv_get_column_names($file) {
+    //open file
+    $handle = fopen($file, 'rb');
+    if ($handle == FALSE) {
+        
+        return FALSE;
+    }
+    //get header row
+    $line = fgets($handle);
+    if ($line == FALSE) {
+        return FALSE;
+    }
+    //detect delimiter
+    $delimiter = csv_delimiter_from_string($line);
+    if ($delimiter == FALSE) {
+        return FALSE;
+    }
+    //get column names
+    $colnames = str_getcsv($line, $delimiter);
+    return $colnames;
+}
+?>

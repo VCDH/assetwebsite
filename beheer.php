@@ -413,6 +413,11 @@ else {
 		<p><a href="historie.php">Historie bekijken</a></p>
 	<?php 
 	}
+	if (accesslevelcheck(255)) {
+		?>
+			<p><a href="import.php">CSV importeren</a></p>
+		<?php 
+		}
 	//user mgmt
 	if (accesslevelcheck('gebruikers_beheren_eigen')) {
 	?>
