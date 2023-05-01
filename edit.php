@@ -22,7 +22,7 @@ include_once('getuserdata.inc.php');
 $login = getuserdata();
 //include database gegevens
 include('dbconnect.inc.php');
-include_once('config.inc.php');
+include('config.inc.php');
 
 $url_base = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
 $url_index = $url_base.'/index.php';
