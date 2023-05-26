@@ -27,6 +27,6 @@ $cfg_accesslevel['gebruikers_beheren_alle'] = 250;      $cfg_accessdescription['
 $cfg_accesslevel['organisaties_beheren_eigen'] = 200;   $cfg_accessdescription['organisaties_beheren_eigen'] = 'Eigen organisatie beheren';      
 $cfg_accesslevel['organisaties_beheren_alle'] = 250;    $cfg_accessdescription['organisaties_beheren_alle'] = 'Alle organisaties beheren';        
 
-$accesslevel_available = array(0 => 'Meekijker', 100 => 'Bewerker', 200 => 'Beheerder', 255 => 'Superbeheerder');
+$accesslevel_available = array(0 => 'Geblokkeerd', 1 => 'Meekijker', 100 => 'Bewerker', 200 => 'Beheerder', 255 => 'Superbeheerder');
 
 ?>

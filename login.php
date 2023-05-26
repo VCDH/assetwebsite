@@ -35,7 +35,7 @@ function user_logout() {
 	//invalidate token
 	$qry = "DELETE FROM `".$db['prefix']."user_login_tokens`
 	WHERE `user_id` = '" . mysqli_real_escape_string($db['link'], getuserdata('id')) . "'
-	`token` = '" . mysqli_real_escape_string($db['link'], getuserdata('token')) . "'";
+	AND `token` = '" . mysqli_real_escape_string($db['link'], getuserdata('token')) . "'";
 	mysqli_query($db['link'], $qry);
 	//unset cookie
 	setcookie($cfg['cookie']['name'], '', time() - 3600, '/');
@@ -51,8 +51,9 @@ function user_login($email, $password) {
 	//hash password
 	include_once('bundled/password_compat/lib/password.php');
 	//get password by username
-	$qry = "SELECT `id`, `password` FROM `".$db['prefix']."user` WHERE
-	`email` = '" . mysqli_real_escape_string($db['link'], $email) . "'";
+	$qry = "SELECT `id`, `password` FROM `".$db['prefix']."user` 
+	WHERE `email` = '" . mysqli_real_escape_string($db['link'], $email) . "' 
+	AND `accesslevel` >= 1";
 	$res = mysqli_query($db['link'], $qry);
 	if (mysqli_num_rows($res) == 1) {
 		//user exists
@@ -136,7 +137,7 @@ function user_signup($email, $organisation, $name, $phone) {
 	`name` = '" . mysqli_real_escape_string($db['link'], $name) . "',
 	`phone` = '" . mysqli_real_escape_string($db['link'], $phone) . "',
 	`organisation` = '" . $organisation_id . "',
-	`accesslevel` = 0,
+	`accesslevel` = 1,
 	`user_edit` = 0,
 	`user_create` = 0";
 	$res = mysqli_query($db['link'], $qry);
@@ -303,7 +304,7 @@ else {
 	echo '<h1>Aanmelden</h1>';
 
 	if (in_array('login', $messages)) {
-		echo '<p class="error">E-mailadres/wachtwoord onjuist</p>';
+		echo '<p class="error">E-mailadres/wachtwoord onjuist, het account bestaat niet of het account is geblokkeerd.</p>';
 	}
 	if (in_array('signup', $messages)) {
 		echo '<p class="success">Registratie succesvol. Er is een e-mail met wachtwoord gestuurd naar het opgegeven e-mailadres. Na aanmelden kan het gegenereerde wachtwoord desgewenst worden gewijzigd.</p>';
