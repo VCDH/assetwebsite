@@ -72,6 +72,11 @@ function user_login($email, $password) {
 			if (!mysqli_query($db['link'], $qry)) {
 				return FALSE;
 			}
+			//set last login
+			$qry = "UPDATE `".$db['prefix']."user` SET 
+			`lastlogin` = NOW()
+			WHERE `id` = '" . mysqli_real_escape_string($db['link'], $data['id']) . "'";
+			mysqli_query($db['link'], $qry);
 
 			//set cookie
 			setcookie($cfg['cookie']['name'], serialize(array($data['id'], $token)), time() + $cfg['cookie']['expire'], '/');
@@ -83,7 +88,7 @@ function user_login($email, $password) {
 }
 
 /*
-* process login
+* process sign up for new account
 */
 function user_signup($email, $organisation, $name, $phone) {
 	require('dbconnect.inc.php');
