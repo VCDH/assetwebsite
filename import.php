@@ -23,6 +23,7 @@ $login = getuserdata();
 //include database gegevens
 include('dbconnect.inc.php');
 include('config.inc.php');
+include('accesslevels.cfg.php');
 
 $url_base = 'http://'.$_SERVER["SERVER_NAME"].substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
 $url_index = $url_base.'/index.php';
@@ -30,7 +31,7 @@ $url_index = $url_base.'/index.php';
 $uploadmap = 'upload/'; //TODO hier een generieke setting van maken
 
 //redirect if not logged in
-if (!getuserdata() || !accesslevelcheck(255)) {
+if (!getuserdata() || !accesslevelcheck($cfg_accesslevel['beheer_import'])) {
 	header('Location:'.$url_index);
 	exit;
 }
@@ -143,6 +144,9 @@ elseif ($_POST['formstep'] == '2') {
 		}
 		//convert string to year
 		if ($replacestr == 'YEAR') {
+			if (is_numeric($str) && ($str >= 1950) && ($str <= date('Y') + 10)) {
+				return $str;
+			}
 			return date('Y', strtotime($str));
 		}
 		//regular search replace search1=replace1;search2=replace2;search...=replace...;[DEFAULT=defaultvalue]
@@ -167,18 +171,37 @@ elseif ($_POST['formstep'] == '2') {
 		}
 		return $str;
 	}
-
-	$num_assets = 0;
+	//set organisation
+	$organisation = getuserdata('organisation');
+	if (is_numeric($_POST['organisation'])) {
+		//check if is allowed
+		if (!accesslevelcheck($cfg_accesslevel['beheer_alle']) && ($_POST['organisation'] != getuserdata('organisation'))) {
+			//should not be reachable
+			echo 'inlezen voor andere organisatie niet toegestaan';
+			exit;
+		}
+		//check if organisation exists
+		$qry2 = "SELECT `id` FROM `".$db['prefix']."organisation` 
+		WHERE `id` = '" . mysqli_real_escape_string($db['link'], $_POST['organisation']) . "'";
+		$res2 = mysqli_query($db['link'], $qry2);
+		if (mysqli_num_rows($res2) != 1) {
+			//should not be reachable
+			echo 'organisatie bestaat niet';
+			exit;
+		}
+		$organisation = $_POST['organisation'];
+	}
 
     //get column names
     $colnames = str_getcsv($line, $delimiter);
 	//process each row
+	$num_assets = 0;
     while ($line = fgetcsv($handle, NULL, $delimiter)) {
 		//get asset id
 		$qry = "SELECT `id`, `assettype` FROM `".$db['prefix']."asset` 
 		WHERE `code` = '" . mysqli_real_escape_string($db['link'], $line[$_POST['code']]) . "' 
 		AND `assettype` = '" . $assettype['id'] . "'
-		AND `organisation` = '" . getuserdata('organisation') . "'
+		AND `organisation` = '" . $organisation . "'
 		LIMIT 1";
 		$res = mysqli_query($db['link'], $qry);
 		//only update when there is a valid asset
@@ -399,10 +422,9 @@ include('menu.inc.php');
 		<input type="hidden" name="file_name" value="<?php echo $file_name; ?>">
 		<fieldset>
 		<legend>Velden koppelen</legend>
-		<p>Selecteer hieronder welk veld uit het CSV-bestand moet worden ingelezen in welk assetveld. Het is mogelijk om assetvelden niet in te lezen. Het veld <i>code</i> geldt als sleutelveld: wanneer een code uit het CSV-bestand overeen komt met een bestaande asset, dan wordt deze bijgewerkt.</p>
+		<p>Selecteer hieronder welk veld uit het CSV-bestand moet worden ingelezen in welk assetveld. Het is mogelijk om assetvelden niet in te lezen. De bestaande waarde blijft dan behouden. Het veld <i>code</i> geldt als sleutelveld: wanneer een code uit het CSV-bestand overeen komt met een bestaande asset, dan wordt deze bijgewerkt.</p>
 
 		<?php
-
 		function generate_field_select($field, $mandatory = false) {
 			global $csv_fields;
 			$html = '<select name="' . $field . '" id="select_' . $field . '">';
@@ -453,10 +475,9 @@ include('menu.inc.php');
 		?>
 		<fieldset>
 			<legend>Inlezen voor organisatie</legend>
-			<p>(nog niet beschikbaar)</p>
 			<?php
 			echo '<label for="organisation">Organisatie:</label>';
-			echo '<select name="organisation"' . (accesslevelcheck(255) ? '' : ' disabled') . ' id="organisation">';
+			echo '<select name="organisation"' . (accesslevelcheck($cfg_accesslevel['beheer_alle']) ? '' : ' disabled') . ' id="organisation">';
 			$qry2 = "SELECT `id`, `name` FROM `".$db['prefix']."organisation` 
 			ORDER BY `name`";
 			$res2 = mysqli_query($db['link'], $qry2);
@@ -469,10 +490,10 @@ include('menu.inc.php');
 			?>
 		</fieldset>
 		<fieldset>
-			<legend>Nieuwe assets afhandelen</legend>
-			<p>Wat moet er gebeuren als een code uit het CSV-bestand niet overeen komt met de code van een bestaande asset? Let op: assets worden ingelezen voor bovenvermelde organisatie, het is dus niet mogelijk om assets bij te werken die door een andere wegbeheerder worden beheerd. Wanneer dit toch wordt geprobeerd, dan zal dit resulteren in dubbele assets die niet meer zelfstandig verwijderd kunnen worden.</p>
-			<input type="radio" name="newassets" id="newassets_0" value="false" checked><label for="newassets_0">Rij uit CSV overslaan</label><br>
-			<input type="radio" name="newassets" id="newassets_1" value="false" disabled><label for="newassets_1">Nieuwe assets importeren</label> (nog niet beschikbaar)
+			<legend>Onbekende code afhandelen</legend>
+			<p>Wat moet er gebeuren als een code uit het CSV-bestand niet overeen komt met de code van een bestaande asset? Let op: assets worden ingelezen voor bovenvermelde organisatie, het is dus niet mogelijk om assets bij te werken die door een andere wegbeheerder worden beheerd. Wanneer dit toch wordt geprobeerd, dan zal dit resulteren in dubbele assets die niet meer zelfstandig verwijderd kunnen worden!</p>
+			<input type="radio" name="newassets" id="newassets_0" value="false" checked><label for="newassets_0">Alleen bestaande assets bijwerken</label><br>
+			<input type="radio" name="newassets" id="newassets_1" value="true" disabled><label for="newassets_1">Bestaande assets bijwerken en nieuwe assets aanmaken</label> (nog niet beschikbaar)
 		</fieldset>
 		<p>
 		<input type="submit" value="Start import">

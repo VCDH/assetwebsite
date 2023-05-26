@@ -1,7 +1,7 @@
 <?php
 /*
  	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020, 2023 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ $cfg_accesslevel = array();
 $cfg_accessdescription = array();
 
 $cfg_accesslevel['beheer_eigen'] = 100;                 $cfg_accessdescription['beheer_eigen'] = 'Assets van eigen organisatie beheren';        
+$cfg_accesslevel['beheer_import'] = 250;                 $cfg_accessdescription['beheer_import'] = 'Assets importeren vanuit CSV';        
 $cfg_accesslevel['beheer_alle'] = 250;                  $cfg_accessdescription['beheer_alle'] = 'Assets van alle organisaties beheren';        
 $cfg_accesslevel['gebruikers_beheren_eigen'] = 200;     $cfg_accessdescription['gebruikers_beheren_eigen'] = 'Gebruikers van eigen organisatie beheren';          
 $cfg_accesslevel['gebruikers_beheren_alle'] = 250;      $cfg_accessdescription['gebruikers_beheren_alle'] = 'Gebruikers van alle organisaties beheren';           

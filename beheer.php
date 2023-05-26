@@ -1,7 +1,7 @@
 <?php 
 /*
  	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2016-2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2016-2020, 2023 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -413,7 +413,7 @@ else {
 		<p><a href="historie.php">Historie bekijken</a></p>
 	<?php 
 	}
-	if (accesslevelcheck(255)) {
+	if (accesslevelcheck($cfg_accesslevel['beheer_import'])) {
 		?>
 			<p><a href="import.php">CSV importeren</a></p>
 		<?php 
