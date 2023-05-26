@@ -18,6 +18,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+include('accesslevels.cfg.php');
+
 //base menu items
 $menuitems = array(
     array(
@@ -82,7 +84,7 @@ $helppage = substr($currentpage, 0, -4);
         //list pages
         foreach ($menuitems as $item) {
             if ( (!isset($item['login']) || ($item['login'] === $logincheck))
-            && (!isset($item['accesslevel']) || (getuserdata('accesslevel') >= $auth[$item['accesslevel']])) ) {
+            && (!isset($item['accesslevel']) || (getuserdata('accesslevel') >= $cfg_accesslevel[$item['accesslevel']])) ) {
                 if ($item['href'] != $currentpage) {
                     echo '<li><a href="' . $item['href'] . '">' . htmlspecialchars($item['label']) . '</a></li>';
                 }
