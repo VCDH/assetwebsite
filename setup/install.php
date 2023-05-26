@@ -345,6 +345,24 @@ if (!is_dir('../store')) {
 else {
 	echo '* Store-mappen niet aangemaakt' . PHP_EOL;
 }
+
+if (!is_dir('../images')) {
+	mkdir('../images');
+	file_put_contents('../images/.htaccess', "deny from all\n");
+	echo '* Images-map aangemaakt' . PHP_EOL;
+}
+else {
+	echo '* Images-map niet aangemaakt' . PHP_EOL;
+}
+if (!is_dir('../upload')) {
+	mkdir('../upload');
+	file_put_contents('../upload/.htaccess', "deny from all\n");
+	echo '* Upload-map aangemaakt' . PHP_EOL;
+}
+else {
+	echo '* Upload-map niet aangemaakt' . PHP_EOL;
+}
+
 /*
 //create attachments dir structure
 if (!is_dir('attachments')) {

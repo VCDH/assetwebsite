@@ -4,4 +4,6 @@ z_oud_*
 store/*
 images/*
 !images/.htaccess
+upload/*
+!upload/.htaccess
 docs/
