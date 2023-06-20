@@ -132,8 +132,7 @@ function user_signup($email, $organisation, $name, $phone) {
 			return 'select_organisation';
 		}
 		else {
-			//signup with organisation 0 if there is no match
-			$organisation_id = 0;
+			return 'invalid_organisation';
 		}
 	}
 	//signup user
@@ -239,6 +238,9 @@ if (($_GET['do'] == 'signup') && (!in_array('signup', $messages))) {
 
 	if ($signupresult === 'select_organisation') {
 		echo '<p class="info">Er zijn meerdere organisatie(onderdelen) beschikbaar. Kies het juiste organisatieonderdeel; na registratie kun je dit zelf niet meer wijzigen.</p>';
+	}
+	if ($signupresult === 'invalid_organisation') {
+		echo '<p class="error">Kan niet registreren. E-mailadres behoort niet tot een toegelaten organisatie.</p>';
 	}
 	if ($signupresult === 'user_exists') {
 		echo '<p class="error">Er bestaat al een account met het opgegeven e-mailadres. Gebruik de optie <a href="?do=lostpass">wachtwoord vergeten</a> op een nieuw wachtwoord aan te vragen.</p>';
