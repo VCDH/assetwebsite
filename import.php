@@ -192,6 +192,14 @@ elseif ($_POST['formstep'] == '2') {
 		$organisation = $_POST['organisation'];
 	}
 
+	//get cache of organisation for wegbeheerder column type
+	$organisation_list = array();
+	$qry2 = "SELECT `id`, `name` FROM `".$db['prefix']."organisation`";
+	$res2 = mysqli_query($db['link'], $qry2);
+	while ($data2 = mysqli_fetch_row($res2)) {
+		$organisation_list[$data2[0]] = $data2[1];
+	}
+
     //get column names
     $colnames = str_getcsv($line, $delimiter);
 	//process each row
@@ -221,6 +229,13 @@ elseif ($_POST['formstep'] == '2') {
 					}
 					//string replace value
 					$line[$_POST[$field[1]]] = asset_strreplace($line[$_POST[$field[1]]], $_POST['strreplace_' . $field[1]]);
+					//wegbeheerder lookup
+					if ($field[2] == 'wegbeheerder') {
+						$org_res = array_search($line[$_POST[$field[1]]], $organisation_list);
+						if ($org_res !== FALSE) {
+							$line[$_POST[$field[1]]] = $org_res;
+						}
+					}
 					//check field validity
 					$fieldcheck = check_submitted_field($field[0], $field[1], $field[2], $line[$_POST[$field[1]]], $field[3], $field[4]);
 					//build update/insert query
@@ -354,6 +369,9 @@ elseif ($_POST['formstep'] == '2') {
 				$num_assets++;
 			}
 		}
+		else {
+			echo htmlspecialchars($line[$_POST['code']]) . ' niet gevonden<br>';
+		}
 	}
 	//unlink file
 	unlink($file_name);
@@ -447,6 +465,9 @@ include('menu.inc.php');
 				echo '<input type="text" name="strreplace_' . $field[1] . '"';
 				if (($field[1] == 'bouwjaar') || ($field[1] == 'oorspronkelijk_bouwjaar')) {
 					echo ' value="YEAR"';
+				}
+				else if ($field[1] == 'status') {
+					echo ' value="bestaand=1;realisatie=2;buiten gebruik=3;verwijderd=4"';
 				}
 				echo ">";
 			}
