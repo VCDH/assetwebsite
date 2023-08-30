@@ -2,7 +2,7 @@
  	fietsviewer - grafische weergave van fietsdata
     Copyright (C) 2018-2019 Gemeente Den Haag, Netherlands
     assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020, 2023 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -87,11 +87,13 @@ function initMap() {
 		updateMapLayers();
 	});
 	map.on('contextmenu', function(e) {
-		console.log(e);
-		L.popup()
-		.setLatLng(e.latlng)
-		.setContent('<h1>' + e.latlng.lat.toFixed(6) + ',' + e.latlng.lng.toFixed(6) + '</h1><p><a href="https://www.google.nl/maps/?q=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;layer=c&cbll=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;cbp=11,' + 0 + ',0,0,5" target="_blank">Open locatie in Google Street View&trade;</a></p>')
-		.openOn(map);
+		//only if not using measurement tool
+		if ($('#map').hasClass('leaflet-measure-map') !== true) {
+			L.popup()
+			.setLatLng(e.latlng)
+			.setContent('<h1>' + e.latlng.lat.toFixed(6) + ',' + e.latlng.lng.toFixed(6) + '</h1><p><a href="https://www.google.nl/maps/?q=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;layer=c&cbll=' + e.latlng.lat + ',' + e.latlng.lng + '&amp;cbp=11,' + 0 + ',0,0,5" target="_blank">Open locatie in Google Street View&trade;</a></p>')
+			.openOn(map);
+		}
 	})
 	//set map position from cookie, if any
 	if ((typeof onloadCookie !== 'undefined') && ($.isNumeric(onloadCookie[1]))) {
@@ -114,6 +116,22 @@ function initMap() {
 	if (typeof centeratid !== 'undefined') {
 		centerMapAtId(centeratid);
 	}
+	//Leaflet Measure
+	L.Measure = {
+	linearMeasurement: "Afstand meten",
+	areaMeasurement: "Oppervlakte meten",
+	start: "start",
+	meter: "m",
+	kilometer: "km",
+	squareMeter: "m²",
+	squareKilometers: "km²",
+	meterDecimals: 2,
+	kilometerDecimals: 2,
+	squareMeterDecimals: 2,
+	squareKilometersDecimals: 2
+	};
+	L.control.measure({title: 'Meten', position: 'topleft'}).addTo(map);
+
 }
 
 /*
@@ -250,7 +268,7 @@ function loadMarkers(layer) {
 						openMapPopup(e, v.id);
 					});
 					marker.on('contextmenu', function(e) {
-						openDetailsWindow(v.id);
+							openDetailsWindow(v.id);
 					});
 				}
 				marker.addTo(map);

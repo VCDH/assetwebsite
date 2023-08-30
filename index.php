@@ -1,7 +1,7 @@
 <?php 
 /*
  	assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020, 2023 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ include('dbconnect.inc.php');
 <title>Assets - Kaart</title>
 <link rel="stylesheet" type="text/css" href="bundled/jquery-ui/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="bundled/leaflet/leaflet.css">
+<link rel="stylesheet" type="text/css" href="bundled/Leaflet.Measure/src/leaflet.measure.css">
 <link rel="stylesheet" type="text/css" href="style/style.css">
 <link rel="icon" type="image/png" href="favicon.png">
 <script src="bundled/jquery/jquery.min.js"></script>
@@ -35,6 +36,7 @@ include('dbconnect.inc.php');
 <script src="bundled/js-cookie/js.cookie.min.js"></script>
 <script src="bundled/leaflet/leaflet.js"></script>
 <script src="bundled/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>
+<script src="bundled/Leaflet.Measure/src/leaflet.measure.js"></script>
 <script src="map.js"></script>
 <script src="details.js"></script>
 <!-- <script src="search.js"></script>TODO misschien opnemen in map.js -->
