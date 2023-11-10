@@ -148,7 +148,7 @@ if (($_GET['data'] == 'json') || ($_GET['download'] == 'json') || ($_GET['downlo
 elseif ($_GET['data'] == 'details') {
 	$json = array('html' => '', 'title' => '');
 	//query om inhoud van tabel te selecteren
-	$qry = "SELECT `t_assettype`.`id` AS `assettypeid`, `t_assettype`.`name` AS `assettypename`, `t_aansturing`.`name` AS `aansturing`, `t_wegbeheerder`.`name` AS `wegbeheerder`, `t_onderhoud`.`name` AS `onderhoud`, `t_voeding`.`name` AS `voeding`, `t_verbinding`.`name` AS `verbinding`, `".$db['prefix']."asset`.`id` AS `assetid`, `code`, `naam`, `latitude`, `longitude`, `heading`, `status`, `leverancier`, `bouwjaar`, `oorspronkelijk_bouwjaar`, `memo`, `organisation`, `".$db['prefix']."asset`.`aansturing` AS `aansturingid`
+	$qry = "SELECT `t_assettype`.`id` AS `assettypeid`, `t_assettype`.`name` AS `assettypename`, `t_aansturing`.`name` AS `aansturing`, `t_wegbeheerder`.`name` AS `wegbeheerder`, `t_onderhoud`.`name` AS `onderhoud`, `t_voeding`.`name` AS `voeding`, `t_verbinding`.`name` AS `verbinding`, `".$db['prefix']."asset`.`id` AS `assetid`, `code`, `naam`, `latitude`, `longitude`, `heading`, `status`, `leverancier`, `bouwjaar`, `oorspronkelijk_bouwjaar`, `memo`, `organisation`, `".$db['prefix']."asset`.`aansturing` AS `aansturingid`, `t_organisation`.`name` AS `organisation_name`
 	FROM `".$db['prefix']."asset`
 	LEFT JOIN `".$db['prefix']."assettype` AS `t_assettype`
 	ON `".$db['prefix']."asset`.`assettype` = `t_assettype`.`id`
@@ -162,6 +162,8 @@ elseif ($_GET['data'] == 'details') {
 	ON `".$db['prefix']."asset`.`voeding` = `t_voeding`.`id`
 	LEFT JOIN `".$db['prefix']."organisation` AS `t_verbinding`
 	ON `".$db['prefix']."asset`.`verbinding` = `t_verbinding`.`id`
+	LEFT JOIN `".$db['prefix']."organisation` AS `t_organisation`
+	ON `organisation` = `t_organisation`.`id`
 	WHERE `".$db['prefix']."asset`.`id` = '" . mysqli_real_escape_string($db['link'], $_GET['id']) . "'";
 	if ($login !== TRUE) {
 		$qry .= " AND `t_assettype`.`public` = 1";
@@ -237,6 +239,7 @@ elseif ($_GET['data'] == 'details') {
 		$html .= '<tr><th>latitude</th><td>' . htmlspecialchars($data['latitude']) . '</td></tr>';
 		$html .= '<tr><th>longitude</th><td>' . htmlspecialchars($data['longitude']) . '</td></tr>';
 		$html .= '<tr><th>heading</th><td>' . htmlspecialchars($data['heading']) . ' graden</td></tr>';
+		$html .= '<tr><th>entry beheerd door</th><td>' . htmlspecialchars($data['organisation_name']) . '</td></tr>';
 		$html .= '</table>';
 		if (!empty($data['memo'])) {
 			$html .= '<p><b>Memo:</b> ' . htmlspecialchars($data['memo']) . '</p>';
@@ -250,10 +253,6 @@ elseif ($_GET['data'] == 'details') {
 
 		$html .= '<p><a href="index.php?id='.$data['assetid'].'">Centreer locatie op kaart</a><br>';
 		$html .= '<a href="https://www.google.nl/maps/?q=' . $data['latitude'] . ',' . $data['longitude'] . '&amp;layer=c&cbll=' . $data['latitude'] . ',' . $data['longitude'] . '&amp;cbp=11,' . $data['heading'] . ',0,0,5" target="_blank">Open locatie in Google Street View&trade;</a></p>';
-		if (getuserdata()) {
-			//rapporteer fout via edit.php
-			$html .= '<p><a href="edit.php?do=report&amp;id='.$data['assetid'].'">Foutieve informatie melden</a></p>';
-		}
 		if (getuserdata() && (accesslevelcheck('beheer_eigen', $data['organisation']) || accesslevelcheck('beheer_alle'))) {
 			$html .= '<p><a href="edit.php?id='.$data['assetid'].'">Bewerken</a></p>';
 			$html .= '<p><a href="historie.php?id='.$data['assetid'].'">Historie</a></p>';
