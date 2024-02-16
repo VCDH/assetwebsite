@@ -79,7 +79,7 @@ function check_submitted_field($fieldid, $fieldname, $fieldclass, $fielddata, $f
 		WHERE `id` = '" . mysqli_real_escape_string($db['link'], $fielddata) . "'";
 		$res2 = mysqli_query($db['link'], $qry2);
 		if (!mysqli_num_rows($res2)) {
-			if ($debug === TRUE) echo $fieldid . '<br>';
+			if ($debug === TRUE) echo $fieldid . ': ' . htmlspecialchars($fielddata) . '<br>';
 			return FALSE;
 		}
 	}

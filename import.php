@@ -147,7 +147,21 @@ elseif ($_POST['formstep'] == '2') {
 			if (is_numeric($str) && ($str >= 1950) && ($str <= date('Y') + 10)) {
 				return $str;
 			}
-			return date('Y', strtotime($str));
+			if (date('Y', strtotime($str)) != 1970) {
+				return date('Y', strtotime($str));
+			}
+			else {
+				return '';
+			}
+		}
+		//convert degree, minute, second to decimal (example 52° 01' 02.3")
+		if ($replacstr == 'DMS') {
+			if (preg_match('/(\d+)°\s*(\d+)\'\s*(\d+(\.\d+)?)"/', $str, $matches) === 1) {
+				return $matches[1]+((($matches[2]*60)+($matches[3]))/3600);
+			}
+			else {
+				return $str;
+			}
 		}
 		//regular search replace search1=replace1;search2=replace2;search...=replace...;[DEFAULT=defaultvalue]
 		$replacestr = explode(';', $replacestr);
@@ -204,7 +218,16 @@ elseif ($_POST['formstep'] == '2') {
     $colnames = str_getcsv($line, $delimiter);
 	//process each row
 	$num_assets = 0;
+	$num_assets_failed = 0;
+	$code_assets_failed = array();
+	$num_assets_updated = 0;
+	$num_assets_updated_failed = 0;
+	$code_assets_updated_failed = array();
+	$num_assets_inserted = 0;
+	$num_assets_inserted_failed = 0;
+	$code_assets_inserted_failed = array();
     while ($line = fgetcsv($handle, NULL, $delimiter)) {
+		$num_assets++;
 		//get asset id
 		$qry = "SELECT `id`, `assettype` FROM `".$db['prefix']."asset` 
 		WHERE `code` = '" . mysqli_real_escape_string($db['link'], $line[$_POST['code']]) . "' 
@@ -212,68 +235,86 @@ elseif ($_POST['formstep'] == '2') {
 		AND `organisation` = '" . $organisation . "'
 		LIMIT 1";
 		$res = mysqli_query($db['link'], $qry);
-		//only update when there is a valid asset
 		if (mysqli_num_rows($res) == 1) {
 			$data = mysqli_fetch_assoc($res);
-			
-			//check fields and create query
-			$fieldcheck = TRUE;
-			$genericfields_updateqry = array();
-			$additionalfields_updateqry = array();
-			//generic fields
-			foreach ($genericfields as $field) {
-				if ($fieldcheck == TRUE) {
-					//check if field is imported; it must be assigned a csv column and must not be 'code' as that is already checked above
-					if (!is_numeric($_POST[$field[1]]) || (strlen($_POST[$field[1]]) < 1) || ($field[1] == 'code')) {
-						continue;
+		}
+		else {
+			$data = array(
+				'id' => NULL,
+				'assettype' => $assettype['id']
+			);
+		}
+		//check fields and create query
+		$fieldcheck = TRUE;
+		$genericfields_updateqry = array();
+		$additionalfields_updateqry = array();
+		//generic fields
+		foreach ($genericfields as $field) {
+			if ($fieldcheck == TRUE) {
+				//for updates, check if field is imported; it must be assigned a csv column and must not be 'code' as that is already checked above
+				if (($data['id'] != NULL) && (!is_numeric($_POST[$field[1]]) || (strlen($_POST[$field[1]]) < 1) || ($field[1] == 'code'))) {
+					continue;
+				}
+				//string replace value
+				$line[$_POST[$field[1]]] = asset_strreplace($line[$_POST[$field[1]]], $_POST['strreplace_' . $field[1]]);
+				//convert RD to WGS84
+				if (($field[1] == 'latitude') && ($_POST['strreplace_latitude'] == 'RD') && ($_POST['strreplace_longitude'] == 'RD') && is_numeric($_POST['latitude']) && is_numeric($_POST['longitude'])) {
+					include_once('functions/convertRD.php');
+					$wgs84 = rd2wgs84($line[$_POST['longitude']],$line[$_POST['latitude']]);
+					$line[$_POST['latitude']] = $wgs84[0];
+					$line[$_POST['longitude']] = $wgs84[1];
+				}
+
+				//wegbeheerder lookup (field type)
+				if ($field[2] == 'wegbeheerder') {
+					$org_res = array_search($line[$_POST[$field[1]]], $organisation_list);
+					if ($org_res !== FALSE) {
+						$line[$_POST[$field[1]]] = $org_res;
 					}
-					//string replace value
-					$line[$_POST[$field[1]]] = asset_strreplace($line[$_POST[$field[1]]], $_POST['strreplace_' . $field[1]]);
-					//wegbeheerder lookup
-					if ($field[2] == 'wegbeheerder') {
-						$org_res = array_search($line[$_POST[$field[1]]], $organisation_list);
-						if ($org_res !== FALSE) {
-							$line[$_POST[$field[1]]] = $org_res;
-						}
-					}
-					//check field validity
-					$fieldcheck = check_submitted_field($field[0], $field[1], $field[2], $line[$_POST[$field[1]]], $field[3], $field[4]);
-					//build update/insert query
-					//set empty string as null
-					if (strlen($line[$_POST[$field[1]]]) == 0) {
-						$genericfields_updateqry[] =  "`" . $field[1] . "` = NULL";
-					}
-					else {
-						$genericfields_updateqry[] =  "`" . $field[1] . "` = '" . mysqli_real_escape_string($db['link'], $line[$_POST[$field[1]]]) . "'";
-					}
+				}
+				//check field validity
+				$fieldcheck = check_submitted_field($field[0], $field[1], $field[2], $line[$_POST[$field[1]]], $field[3], $field[4]);
+				//build update/insert query
+				//set empty string as null
+				if (strlen($line[$_POST[$field[1]]]) == 0) {
+					$genericfields_updateqry[] =  "`" . $field[1] . "` = NULL";
 				}
 				else {
-					break;
+					$genericfields_updateqry[] =  "`" . $field[1] . "` = '" . mysqli_real_escape_string($db['link'], $line[$_POST[$field[1]]]) . "'";
 				}
 			}
-			//additional fields
-			foreach ($additionalfields as $field) {
-				if ($fieldcheck == TRUE) {
-					//do not check these, as these cannot be imported
-					if (($field[2] == 'drip_standaardtekst') || ($field[2] == 'drip_bewegwijzering')) { 
-						continue;
-					}
-					//check if field is imported; it must be assigned a csv column
-					if (!is_numeric($_POST[$field[1]]) || (strlen($_POST[$field[1]]) < 1)) {
-						continue;
-					}
-					//string replace value
-					$line[$_POST[$field[1]]] = asset_strreplace($line[$_POST[$field[1]]], $_POST['strreplace_' . $field[1]]);
-					//check field validity
-					$fieldcheck = check_submitted_field($field[0], $field[1], $field[2], $line[$_POST[$field[1]]], $field[3], $field[4]);
+			else {
+				break;
+			}
+		}
+		//additional fields
+		foreach ($additionalfields as $field) {
+			if ($fieldcheck == TRUE) {
+				//do not check these, as these cannot be imported
+				if (($field[2] == 'drip_standaardtekst') || ($field[2] == 'drip_bewegwijzering')) { 
+					continue;
+				}
+				//for updates, check if field is imported; it must be assigned a csv column
+				if (($data['id'] != NULL) && (!is_numeric($_POST[$field[1]]) || (strlen($_POST[$field[1]]) < 1))) {
+					continue;
+				}
+				//string replace value
+				$line[$_POST[$field[1]]] = asset_strreplace($line[$_POST[$field[1]]], $_POST['strreplace_' . $field[1]]);
+				//check field validity
+				$fieldcheck = check_submitted_field($field[0], $field[1], $field[2], $line[$_POST[$field[1]]], $field[3], $field[4]);
+				//don't add new empty rows
+				if (($data['id'] != NULL) || !empty($line[$_POST[$field[1]]])) {
 					$additionalfields_updateqry[] = array('addfield' => substr($field[0], 2), 'content' => $line[$_POST[$field[1]]]);
 				}
-				else {
-					break;
-				}
 			}
-			//if checks passed, prepare to update database
-			if ($fieldcheck === TRUE) {
+			else {
+				break;
+			}
+		}
+		//if checks passed, prepare to update database
+		if ($fieldcheck === TRUE) {
+			//only update when there is a valid asset
+			if ($data['id'] != NULL) {
 				//copy old data to history
 				$qry = "INSERT INTO `".$db['prefix']."asset_history` (
 					`id`,
@@ -365,12 +406,64 @@ elseif ($_POST['formstep'] == '2') {
 						`user_edit` = '" . getuserdata('id') . "'";
 						$res = mysqli_query($db['link'], $qry);
 					}
+					
 				}
-				$num_assets++;
+				if ($res === TRUE) {
+					$num_assets_updated++;
+				}
+				else {
+					$num_assets_updated_failed++;
+					$code_assets_updated_failed[] = $line[$_POST['code']];
+					var_dump($line[$_POST['code']]);
+					echo 'here';
+				}
+			}
+			//insert new
+			elseif ($_POST['newassets'] == 'true') {
+				//generic fields
+				$qry = "INSERT INTO `".$db['prefix']."asset` SET 
+				`assettype` = '" . $data['assettype'] . "', ";
+				$qry .= join(', ', $genericfields_updateqry);
+				$qry .= ", `organisation` = '" . $organisation . "',
+				`date_edit` = NOW(),
+				`user_edit` = '" . getuserdata('id') . "', 
+				`date_create` = NOW(),
+				`user_create` = '" . getuserdata('id') . "'";
+				$res = mysqli_query($db['link'], $qry);
+				$data['id'] = mysqli_insert_id($db['link']);
+
+				//additional fields
+				if (($res === TRUE) && is_numeric($data['id'])) {
+					foreach ($additionalfields_updateqry as $field) {
+						//insert if value
+						if (!empty($field['content'])) {
+							$qry = "INSERT INTO `".$db['prefix']."addfieldcontent` SET 
+							`asset` = '" . $data['id'] . "',
+							`addfield` = '" . mysqli_real_escape_string($db['link'], $field['addfield']) . "',
+							`content` = '" . mysqli_real_escape_string($db['link'], $field['content']) . "',
+							`date_edit` = NOW(),
+							`user_edit` = '" . getuserdata('id') . "',
+							`date_create` = NOW(),
+							`user_create` = '" . getuserdata('id') . "'";
+							$res = mysqli_query($db['link'], $qry);
+						}
+					}
+				}
+				else {
+					$res = FALSE;
+				}
+				if ($res === TRUE) {
+					$num_assets_inserted++;
+				}
+				else {
+					$num_assets_inserted_failed++;
+					$code_assets_inserted_failed[] = $line[$_POST['code']];
+				}
 			}
 		}
 		else {
-			echo htmlspecialchars($line[$_POST['code']]) . ' niet gevonden<br>';
+			$num_assets_failed++;
+			$code_assets_failed[] = $line[$_POST['code']];
 		}
 	}
 	//unlink file
@@ -469,6 +562,9 @@ include('menu.inc.php');
 				else if ($field[1] == 'status') {
 					echo ' value="bestaand=1;realisatie=2;buiten gebruik=3;verwijderd=4"';
 				}
+				else if ($field[1] == 'heading') {
+					echo ' value="DEFAULT=0"';
+				}
 				echo ">";
 			}
 			echo '</td></tr>';
@@ -485,6 +581,9 @@ include('menu.inc.php');
 				echo '<input type="text" name="strreplace_' . $dat2['name'] . '"';
 				if ($dat2['name'] == 'iVRI') {
 					echo ' value="ja=1;iVRI ready=1;iVRI=1;DEFAULT=0"';
+				}
+				if ($dat2['name'] == 'PTZ') {
+					echo ' value="ja=1;DEFAULT=0"';
 				}
 				echo ">";
 				echo '</td></tr>';
@@ -514,7 +613,7 @@ include('menu.inc.php');
 			<legend>Onbekende code afhandelen</legend>
 			<p>Wat moet er gebeuren als een code uit het CSV-bestand niet overeen komt met de code van een bestaande asset? Let op: assets worden ingelezen voor bovenvermelde organisatie, het is dus niet mogelijk om assets bij te werken die door een andere wegbeheerder worden beheerd. Wanneer dit toch wordt geprobeerd, dan zal dit resulteren in dubbele assets die niet meer zelfstandig verwijderd kunnen worden!</p>
 			<input type="radio" name="newassets" id="newassets_0" value="false" checked><label for="newassets_0">Alleen bestaande assets bijwerken</label><br>
-			<input type="radio" name="newassets" id="newassets_1" value="true" disabled><label for="newassets_1">Bestaande assets bijwerken en nieuwe assets aanmaken</label> (nog niet beschikbaar)
+			<input type="radio" name="newassets" id="newassets_1" value="true"><label for="newassets_1">Bestaande assets bijwerken en nieuwe assets aanmaken</label>
 		</fieldset>
 		<p>
 		<input type="submit" value="Start import">
@@ -527,7 +626,29 @@ include('menu.inc.php');
 	elseif ($_POST['formstep'] == '2') {
 		?>
 		<h1>Assets importeren uit CSV-bestand - voltooid</h1>
-		<p>Het importeren is voltooid. Er zijn <?php echo $num_assets; ?> assets bijgewerkt.
+		<p>Het importeren is voltooid.<br>
+		<?php echo $num_assets; ?> rijen in CSV<br>
+		<?php echo $num_assets_failed; ?> ongeldige rijen<br>
+		<?php if (count($code_assets_failed) > 0 ) {
+			echo htmlspecialchars(join(', ', $code_assets_failed)); 
+			echo '<br>';
+		}
+		?>
+		<?php echo $num_assets_updated; ?> assets bijgewerkt<br>
+		<?php echo $num_assets_updated_failed; ?> assets bijwerken mislukt<br>
+		<?php if (count($code_assets_updated_failed) > 0 ) {
+			echo htmlspecialchars(join(', ', $code_assets_updated_failed)); 
+			echo '<br>';
+		}
+		?>
+		<?php echo $num_assets_inserted; ?> nieuwe assets toevoegoegd<br>
+		<?php echo $num_assets_inserted_failed; ?> nieuwe assets mislukt<br>
+		<?php if (count($code_assets_inserted_failed) > 0 ) {
+			echo htmlspecialchars(join(', ', $code_assets_inserted_failed)); 
+			echo '<br>';
+		}
+		?>
+		</p>
 		<?php
 	}
 	?>
