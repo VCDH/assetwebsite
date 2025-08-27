@@ -75,11 +75,14 @@ include('dbconnect.inc.php');
     <fieldset>
     <legend>Kaartweergave</legend>	
 		<ul id="map-style">
-            <li><input type="radio" name="map-style" id="map-style-default"><label for="map-style-default">Standaard</label><br></li>
-            <li><input type="radio" name="map-style" id="map-style-lighter"><label for="map-style-lighter">Lichter</label><br></li>
-            <li><input type="radio" name="map-style" id="map-style-grayscale"><label for="map-style-grayscale">Grijswaarden</label><br></li>
-            <li><input type="radio" name="map-style" id="map-style-dark"><label for="map-style-dark">Donker</label><br></li>
+            <li><input type="radio" name="map-style" id="map-style-default"><label for="map-style-default">Standaard</label></li>
+            <li><input type="radio" name="map-style" id="map-style-lighter"><label for="map-style-lighter">Lichter</label></li>
+            <li><input type="radio" name="map-style" id="map-style-grayscale"><label for="map-style-grayscale">Grijswaarden</label></li>
+            <li><input type="radio" name="map-style" id="map-style-dark"><label for="map-style-dark">Donker</label></li>
             <li><input type="radio" name="map-style" id="map-style-oldskool"><label for="map-style-oldskool">Vergeeld</label></li>
+        </ul>
+        <ul id="map-labels">
+            <li><input type="checkbox" id="map-labels-active"><label for="map-labels-active">Toon labels</label></li>
         </ul>
     </fieldset>
 </div>

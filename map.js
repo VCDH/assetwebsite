@@ -263,6 +263,10 @@ function loadMarkers(layer) {
 						rotationAngle: v.heading,
 						rotationOrigin: 'center',
 						title: v.code
+					}).bindTooltip(v.code, {
+						permanent: true, 
+						direction: 'right',
+						className: 'markerlabel'
 					});
 					marker.on('click', function(e) {
 						openMapPopup(e, v.id);
@@ -286,6 +290,8 @@ function loadMarkers(layer) {
 		}
 		//remove loading indicator
 		$('#map-loading').hide();
+		//set label visibility
+		updateLabelsActive();
 	});
 }
 
@@ -408,6 +414,18 @@ function drawTileLayerGUI() {
 }
 
 /*
+* set label visibility
+*/
+function updateLabelsActive() {
+	if ($('#map-labels-active').prop('checked')) {
+		$('.markerlabel').css('visibility', 'visible');
+	}
+	else {
+		$('.markerlabel').css('visibility', 'hidden');
+	}
+}
+
+/*
 * document.ready
 */
 $(function() {
@@ -421,6 +439,10 @@ $(function() {
 	$('#map-style input').change( function() {
 		setMapStyle(this.id);
 		updateMapStyle();
+	});
+	//handle change tooltip
+	$('#map-labels-active').change( function() {
+		updateLabelsActive();
 	});
 	initLayerGUI();
 });

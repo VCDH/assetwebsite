@@ -279,7 +279,7 @@ img.map-style-oldskool {
 .L-icon-trans {
 	opacity: 0.5;
 }
-.hectolabel {
+.hectolabel, .markerlabel {
 	font-size: x-small;
 	color: #333;
 	font-weight: bold;
@@ -292,8 +292,12 @@ img.map-style-oldskool {
 	margin-left: 0;
 	padding: 5px;
 }
-.hectolabel::before {
+.hectolabel::before, .markerlabel::before {
 	border: none;
+}
+.markerlabel {
+	padding-left: 12px;
+	visibility: hidden;
 }
 /* map messages */
 #map-loading {	
