@@ -2,7 +2,7 @@
  	fietsviewer - grafische weergave van fietsdata
     Copyright (C) 2018-2019 Gemeente Den Haag, Netherlands
     assetwebsite - viewer en aanvraagformulier voor verkeersmanagementassets
-    Copyright (C) 2020, 2023 Gemeente Den Haag, Netherlands
+    Copyright (C) 2020, 2023, 2025 Gemeente Den Haag, Netherlands
     Developed by Jasper Vries
  
     This program is free software: you can redistribute it and/or modify
@@ -353,7 +353,7 @@ function setMapCookie() {
 			activeMapLayers.push(layer);
 		}
 	});
-	Cookies.set('assetwebsite_map', [map.getCenter(), map.getZoom(), selectedMapStyle, activeMapLayers, selectedTileLayer], {expires: 1000});
+	Cookies.set('assetwebsite_map', [map.getCenter(), map.getZoom(), selectedMapStyle, activeMapLayers, selectedTileLayer, $('#map-labels-active').prop('checked')], {expires: 1000});
 }
 
 /*
@@ -414,6 +414,15 @@ function drawTileLayerGUI() {
 }
 
 /*
+* set label visibility checkbox on load
+*/
+function onloadLabelsActive() {
+	if ((typeof onloadCookie !== 'undefined') && (typeof onloadCookie[5] == 'boolean') && onloadCookie[5] == true) {
+		$('#map-labels-active').prop('checked', true);
+	}
+}
+
+/*
 * set label visibility
 */
 function updateLabelsActive() {
@@ -433,6 +442,7 @@ $(function() {
 	//initialize map
 	drawTileLayerGUI();
 	getMapTileLayer();
+	onloadLabelsActive();
 	initMap();
 	getMapStyle();
 	//handle to change map style
@@ -443,6 +453,7 @@ $(function() {
 	//handle change tooltip
 	$('#map-labels-active').change( function() {
 		updateLabelsActive();
+		setMapCookie();
 	});
 	initLayerGUI();
 });
