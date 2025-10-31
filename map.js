@@ -456,6 +456,25 @@ $(function() {
 		setMapCookie();
 	});
 	initLayerGUI();
+
+	//shade mapoptions
+	$('#map-options-container fieldset legend').click(function() {
+		if ($(this).next().is(':visible')) {
+			$(this).next().hide();
+			$(this).parent().addClass('hidden');
+		}
+		else {
+			$(this).next().show();
+			$(this).parent().removeClass('hidden');
+		}
+		
+	});
+	//default hide map tile and style selection
+	$('#map-tile').hide();
+	$('#map-tile').parent().addClass('hidden');
+	$('#map-style').hide();
+	$('#map-style').parent().addClass('hidden');
+
 });
 
 
